@@ -13,7 +13,7 @@ const router = new VueRouter({
         path: '/lists',
         component: require('./components/lists/index'),
         children: [{
-            path: 'show',
+            path: ':id',
             component: require('./components/lists/show')
         }]
     }, {
