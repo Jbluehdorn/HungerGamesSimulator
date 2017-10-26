@@ -5,7 +5,7 @@
                 <router-link tag="a" to="/home">Home</router-link>
             </li>
             <li>
-                <router-link tag="a" to="/other">Other</router-link>
+                <router-link tag="a" to="/lists">Lists</router-link>
             </li>
         </ul>
     </nav>

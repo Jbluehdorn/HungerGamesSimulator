@@ -8,10 +8,14 @@ Vue.use(Vuex);
 const router = new VueRouter({
     routes: [{
         path: '/home',
-        component: require('./components/home')
+        component: require('./components/index')
     }, {
-        path: '/other',
-        component: require('./components/route2')
+        path: '/lists',
+        component: require('./components/lists/index'),
+        children: [{
+            path: 'show',
+            component: require('./components/lists/show')
+        }]
     }, {
         path: '**',
         redirect: '/home'

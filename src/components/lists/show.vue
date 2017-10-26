@@ -1,5 +1,5 @@
 <template>
   <div>
-      <h1>This is another route!</h1>
+      <h1>Show!</h1>
   </div>
 </template>
