@@ -1,11 +1,52 @@
 <template>
-  <div>
-      <div class="col-xs-4">
-          <h1>Here's a thing!</h1>
-          <router-link tag="a" to="/lists/1">Sub Route</router-link>
-      </div>
-      <div class="col-xs-8">
-          <router-view></router-view>
-      </div>
-  </div>
+    <div class="row">
+        <div class="col-xs-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Lists</h3>
+                </div>
+                <table class="table-responsive table table-striped table-hover">
+                    <tbody>
+                    <router-link tag="tr" :to="`/lists/${list.fileName}`" v-for="list in filteredLists" :key="list.fileName">
+                        <td>{{list.name}}</td>
+                    </router-link>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-xs-8">
+            <router-view></router-view>
+        </div>
+    </div>
 </template>
+
+<script>
+import store from "../../store.js";
+import _ from 'lodash'
+
+export default {
+    mounted() {
+        this.load();
+    },
+    data() {
+        return {
+        lists: []
+        };
+    },
+    methods: {
+        load() {
+        this.lists = store.getLists();
+        }
+    },
+    computed: {
+        filteredLists() {
+            return _.map(this.lists, function(value) {
+                return {
+                    fileName: value,
+                    name: value.slice(0, value.indexOf('.'))
+                }
+            });
+        }
+    }
+};
+</script>

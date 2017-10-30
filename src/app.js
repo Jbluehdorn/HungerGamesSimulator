@@ -5,6 +5,12 @@ import Vuex from 'vuex';
 Vue.use(VueRouter);
 Vue.use(Vuex);
 
+const store = new Vuex.Store({
+    state: {
+        lists: ['Coaches', 'Heisman players']
+    }
+});
+
 const router = new VueRouter({
     routes: [{
         path: '/home',
@@ -13,7 +19,7 @@ const router = new VueRouter({
         path: '/lists',
         component: require('./components/lists/index'),
         children: [{
-            path: ':id',
+            path: ':name',
             component: require('./components/lists/show')
         }]
     }, {
