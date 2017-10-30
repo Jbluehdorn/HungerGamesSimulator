@@ -5,5 +5,8 @@ export default {
     errors: [],
     getLists() {
         return fs.readdirSync(listsFolder);
+    },
+    loadFile(fileName) {
+        return fs.readFileSync(listsFolder + fileName, 'utf8');
     }
 }
