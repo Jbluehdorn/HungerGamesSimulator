@@ -1,0 +1,73 @@
+Hunger Games Simulator Overview
+
+20 coaches per round, 7 rounds
+
+Weapons		= [ Sword x5, Bow x5, Axe x5 ]
+Coaches		= [ LIST_OF_COACHES ]
+	Coach.state		  = [ ‘None’, ‘Hiding’, ‘Running’]
+	Coach.weapon		= [ WEAPON]
+Actions		= [ ’Attacked’, ‘Picked Up’, ‘Hid’, ‘Ran’ ]
+Targets		= [ [LIST_OF_COACHES], [HIDING_OBJECTS], 
+			      [AVAILABLE_OBJECTS], [AVAILABLE_WEAPONS] ]
+AVAILABLE_OBJECTS = [‘Berries’]. (OTHERS?)
+
+Stages : 
+	- Initialize Sim
+		- Randomize coaches, re-randomize every iteration
+		- Weapon Store is initially full
+	- Weapon Grab
+		- Each coach gets to the weapon store in order of: 
+			- Agility - randFloat(0,1)
+		If AVAILABLE_WEAPONS.len > 0:
+			If PrimaryWeapon in AVAILABLE_WEAPONS:
+				Coach.weapon = PrimaryWeapon
+				Coach.state = ’None’
+			Else:
+				Coach.weapon = AVAILABLE_WEAPONS.pop
+		Else:
+			RUN || HIDE
+				Set coach.state accordingly
+			
+	- Day by Day
+		- Randomize coach list
+		- In order of randomized coach list 
+			- Select an action
+				if coach.weapon = ‘None’:
+					if AVAILABLE_WEAPONS isn’t empty:
+						action = ‘pickup’
+					else:
+						action = ‘hide’ || ‘run’
+							Set coach.state accordingly
+				else:
+					chooseAction(ACTIONS)
+			- Select a target
+				if action == hide:
+					target = selectOne(HIDING_OBJECTS)
+				if action == attacking:
+					selectOne(LIST_OF_COACHES)
+					if target is hiding:
+						#reroll
+						target = selectOne(LIST_OF_COACHES)
+				if action == pickup:
+					target = selectOne(AVAILABLE_OBJECTS)
+				if action == run:
+					target = None
+			- Calculate an outcome
+				if action == hiding:
+					ex: “Mike Leach hid behind a tree”
+				if action == attack:
+					Calculate Damage on Target:
+						Damage = RandFloat(0,1)*Strength + 
+								  WeaponBonus 
+						If Target is running:
+							Damage = Damage / 2
+					ex: “Mike Leach attacked Lane Kiffin, 
+						Inflicted 5 damage.”
+					Calculate remaining HP for target, if dead, 
+					remove from list:
+						ex: “Lane Kiffin has died. 
+							He drops his belongings.”
+				if action == pick up:
+					ex: “Mike Leach picked up a battleaxe”
+				if action == run:
+					ex: “Mike Leach started running”
