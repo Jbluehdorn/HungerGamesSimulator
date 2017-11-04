@@ -60,11 +60,17 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+module.exports = "/fonts/vendor/vue-json-editor/img/jsoneditor-icons.svg?256e3abce3a61ba656dbb8f4967e3933";
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports) {
 
 /* globals __VUE_SSR_CONTEXT__ */
@@ -173,7 +179,7 @@ module.exports = function normalizeComponent (
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports) {
 
 var g;
@@ -200,23 +206,123 @@ module.exports = g;
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(3);
-module.exports = __webpack_require__(25);
-
-
-/***/ }),
 /* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+var listsFolder = 'storage/lists/';
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+    loading: false,
+    errors: [],
+    getLists: function getLists() {
+        return fs.readdirSync(listsFolder);
+    },
+    loadFile: function loadFile(fileName) {
+        return fs.readFileSync(listsFolder + fileName, 'utf8');
+    }
+});
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function(useSourceMap) {
+	var list = [];
+
+	// return the list of modules as css string
+	list.toString = function toString() {
+		return this.map(function (item) {
+			var content = cssWithMappingToString(item, useSourceMap);
+			if(item[2]) {
+				return "@media " + item[2] + "{" + content + "}";
+			} else {
+				return content;
+			}
+		}).join("");
+	};
+
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+	var content = item[1] || '';
+	var cssMapping = item[3];
+	if (!cssMapping) {
+		return content;
+	}
+
+	if (useSourceMap && typeof btoa === 'function') {
+		var sourceMapping = toComment(cssMapping);
+		var sourceURLs = cssMapping.sources.map(function (source) {
+			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
+		});
+
+		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+	}
+
+	return [content].join('\n');
+}
+
+// Adapted from convert-source-map (MIT)
+function toComment(sourceMap) {
+	// eslint-disable-next-line no-undef
+	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+
+	return '/*# ' + data + ' */';
+}
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(6);
+module.exports = __webpack_require__(41);
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_router__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vuex__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_router__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vuex__ = __webpack_require__(12);
 
 
 
@@ -233,13 +339,13 @@ var store = new __WEBPACK_IMPORTED_MODULE_2_vuex__["a" /* default */].Store({
 var router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
     routes: [{
         path: '/home',
-        component: __webpack_require__(10)
+        component: __webpack_require__(13)
     }, {
         path: '/lists',
-        component: __webpack_require__(12),
+        component: __webpack_require__(15),
         children: [{
             path: ':name',
-            component: __webpack_require__(16)
+            component: __webpack_require__(20)
         }]
     }, {
         path: '**',
@@ -249,13 +355,13 @@ var router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
 
 var vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
     render: function render(h) {
-        return h(__webpack_require__(19));
+        return h(__webpack_require__(35));
     },
     router: router
 }).$mount('#main');
 
 /***/ }),
-/* 4 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10821,10 +10927,10 @@ Vue$3.compile = compileToFunctions;
 
 module.exports = Vue$3;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(5).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(8).setImmediate))
 
 /***/ }),
-/* 5 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -10877,13 +10983,13 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(6);
+__webpack_require__(9);
 exports.setImmediate = setImmediate;
 exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 6 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -11073,10 +11179,10 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(7)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(10)))
 
 /***/ }),
-/* 7 */
+/* 10 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -11266,7 +11372,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 8 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13896,7 +14002,7 @@ if (inBrowser && window.Vue) {
 
 
 /***/ }),
-/* 9 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14841,15 +14947,15 @@ var index_esm = {
 
 
 /***/ }),
-/* 10 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(0)
+var normalizeComponent = __webpack_require__(1)
 /* script */
 var __vue_script__ = null
 /* template */
-var __vue_template__ = __webpack_require__(11)
+var __vue_template__ = __webpack_require__(14)
 /* template functional */
   var __vue_template_functional__ = false
 /* styles */
@@ -14866,7 +14972,7 @@ var Component = normalizeComponent(
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/components/index.vue"
+Component.options.__file = "src/js/components/index.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
 
 /* hot reload */
@@ -14876,9 +14982,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-4efca482", Component.options)
+    hotAPI.createRecord("data-v-351ab9e9", Component.options)
   } else {
-    hotAPI.reload("data-v-4efca482", Component.options)
+    hotAPI.reload("data-v-351ab9e9", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -14889,7 +14995,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 11 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -14911,20 +15017,20 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-4efca482", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-351ab9e9", module.exports)
   }
 }
 
 /***/ }),
-/* 12 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(0)
+var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(13)
+var __vue_script__ = __webpack_require__(16)
 /* template */
-var __vue_template__ = __webpack_require__(15)
+var __vue_template__ = __webpack_require__(19)
 /* template functional */
   var __vue_template_functional__ = false
 /* styles */
@@ -14941,7 +15047,7 @@ var Component = normalizeComponent(
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/components/lists/index.vue"
+Component.options.__file = "src/js/components/lists/index.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
 
 /* hot reload */
@@ -14951,9 +15057,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-038ae7f6", Component.options)
+    hotAPI.createRecord("data-v-3ca050af", Component.options)
   } else {
-    hotAPI.reload("data-v-038ae7f6", Component.options)
+    hotAPI.reload("data-v-3ca050af", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -14964,13 +15070,13 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 13 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__store_js__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__store_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
 //
 //
@@ -15026,977 +15132,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 14 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var listsFolder = 'storage/lists/';
-
-/* harmony default export */ __webpack_exports__["a"] = ({
-    loading: false,
-    errors: [],
-    getLists: function getLists() {
-        return fs.readdirSync(listsFolder);
-    },
-    loadFile: function loadFile(fileName) {
-        return fs.readFileSync(listsFolder + fileName, 'utf8');
-    }
-});
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "row" }, [
-    _c("div", { staticClass: "col-xs-4" }, [
-      _c("div", { staticClass: "panel panel-default" }, [
-        _vm._m(0),
-        _vm._v(" "),
-        _c(
-          "table",
-          { staticClass: "table-responsive table table-striped table-hover" },
-          [
-            _c(
-              "tbody",
-              _vm._l(_vm.filteredLists, function(list) {
-                return _c(
-                  "router-link",
-                  {
-                    key: list.fileName,
-                    attrs: { tag: "tr", to: "/lists/" + list.fileName }
-                  },
-                  [_c("td", [_vm._v(_vm._s(list.name))])]
-                )
-              })
-            )
-          ]
-        )
-      ])
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "col-xs-8" }, [_c("router-view")], 1)
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "panel-heading" }, [
-      _c("h3", { staticClass: "panel-title" }, [_vm._v("Lists")])
-    ])
-  }
-]
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-038ae7f6", module.exports)
-  }
-}
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var normalizeComponent = __webpack_require__(0)
-/* script */
-var __vue_script__ = __webpack_require__(17)
-/* template */
-var __vue_template__ = __webpack_require__(18)
-/* template functional */
-  var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = null
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/components/lists/show.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-150383cc", Component.options)
-  } else {
-    hotAPI.reload("data-v-150383cc", Component.options)
-' + '  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
 /* 17 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__store_js__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_json_editor__ = __webpack_require__(58);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_json_editor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue_json_editor__);
-//
-//
-//
-//
-//
-//
-//
-
-
-
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  mounted: function mounted() {
-    this.refresh();
-  },
-
-  components: {
-    vueJsonEditor: __WEBPACK_IMPORTED_MODULE_1_vue_json_editor___default.a
-  },
-  data: function data() {
-    return {
-      list: null,
-      customToolbar: []
-    };
-  },
-
-  methods: {
-    refresh: function refresh() {
-      this.list = JSON.parse(__WEBPACK_IMPORTED_MODULE_0__store_js__["a" /* default */].loadFile(this.$route.params.name));
-    }
-  },
-  watch: {
-    '$route.params.name': function $routeParamsName() {
-      this.refresh();
-    }
-  }
-});
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    [
-      _c("h1", [_vm._v(_vm._s(this.$route.params.name))]),
-      _vm._v(" "),
-      _c("vue-json-editor", {
-        attrs: { showBtns: false },
-        model: {
-          value: _vm.list,
-          callback: function($$v) {
-            _vm.list = $$v
-          },
-          expression: "list"
-        }
-      })
-    ],
-    1
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-150383cc", module.exports)
-  }
-}
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var normalizeComponent = __webpack_require__(0)
-/* script */
-var __vue_script__ = __webpack_require__(20)
-/* template */
-var __vue_template__ = __webpack_require__(24)
-/* template functional */
-  var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = null
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/Main.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-78163802", Component.options)
-  } else {
-    hotAPI.reload("data-v-78163802", Component.options)
-' + '  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_navbar__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_navbar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_navbar__);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        navBar: __WEBPACK_IMPORTED_MODULE_0__components_navbar___default.a
-    }
-});
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var normalizeComponent = __webpack_require__(0)
-/* script */
-var __vue_script__ = __webpack_require__(22)
-/* template */
-var __vue_template__ = __webpack_require__(23)
-/* template functional */
-  var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = null
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/components/navbar.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-012a25f3", Component.options)
-  } else {
-    hotAPI.reload("data-v-012a25f3", Component.options)
-' + '  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 22 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({});
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("nav", { staticClass: "navbar navbar-inverse navbar-fixed-top" }, [
-    _c("ul", { staticClass: "nav navbar-nav" }, [
-      _c(
-        "li",
-        [
-          _c("router-link", { attrs: { tag: "a", to: "/home" } }, [
-            _vm._v("Home")
-          ])
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "li",
-        [
-          _c("router-link", { attrs: { tag: "a", to: "/lists" } }, [
-            _vm._v("Lists")
-          ])
-        ],
-        1
-      )
-    ])
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-012a25f3", module.exports)
-  }
-}
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    [
-      _c("nav-bar"),
-      _vm._v(" "),
-      _c("div", { staticClass: "container-fluid" }, [_c("router-view")], 1)
-    ],
-    1
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-78163802", module.exports)
-  }
-}
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 26 */,
-/* 27 */
-/***/ (function(module, exports) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-module.exports = function(useSourceMap) {
-	var list = [];
-
-	// return the list of modules as css string
-	list.toString = function toString() {
-		return this.map(function (item) {
-			var content = cssWithMappingToString(item, useSourceMap);
-			if(item[2]) {
-				return "@media " + item[2] + "{" + content + "}";
-			} else {
-				return content;
-			}
-		}).join("");
-	};
-
-	// import a list of modules into the list
-	list.i = function(modules, mediaQuery) {
-		if(typeof modules === "string")
-			modules = [[null, modules, ""]];
-		var alreadyImportedModules = {};
-		for(var i = 0; i < this.length; i++) {
-			var id = this[i][0];
-			if(typeof id === "number")
-				alreadyImportedModules[id] = true;
-		}
-		for(i = 0; i < modules.length; i++) {
-			var item = modules[i];
-			// skip already imported module
-			// this implementation is not 100% perfect for weird media query combinations
-			//  when a module is imported multiple times with different media queries.
-			//  I hope this will never occur (Hey this way we have smaller bundles)
-			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-				if(mediaQuery && !item[2]) {
-					item[2] = mediaQuery;
-				} else if(mediaQuery) {
-					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-				}
-				list.push(item);
-			}
-		}
-	};
-	return list;
-};
-
-function cssWithMappingToString(item, useSourceMap) {
-	var content = item[1] || '';
-	var cssMapping = item[3];
-	if (!cssMapping) {
-		return content;
-	}
-
-	if (useSourceMap && typeof btoa === 'function') {
-		var sourceMapping = toComment(cssMapping);
-		var sourceURLs = cssMapping.sources.map(function (source) {
-			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
-		});
-
-		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
-	}
-
-	return [content].join('\n');
-}
-
-// Adapted from convert-source-map (MIT)
-function toComment(sourceMap) {
-	// eslint-disable-next-line no-undef
-	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
-	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
-
-	return '/*# ' + data + ' */';
-}
-
-
-/***/ }),
-/* 28 */,
-/* 29 */,
-/* 30 */,
-/* 31 */,
-/* 32 */,
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-
-var stylesInDom = {};
-
-var	memoize = function (fn) {
-	var memo;
-
-	return function () {
-		if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-		return memo;
-	};
-};
-
-var isOldIE = memoize(function () {
-	// Test for IE <= 9 as proposed by Browserhacks
-	// @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
-	// Tests for existence of standard globals is to allow style-loader
-	// to operate correctly into non-standard environments
-	// @see https://github.com/webpack-contrib/style-loader/issues/177
-	return window && document && document.all && !window.atob;
-});
-
-var getElement = (function (fn) {
-	var memo = {};
-
-	return function(selector) {
-		if (typeof memo[selector] === "undefined") {
-			memo[selector] = fn.call(this, selector);
-		}
-
-		return memo[selector]
-	};
-})(function (target) {
-	return document.querySelector(target)
-});
-
-var singleton = null;
-var	singletonCounter = 0;
-var	stylesInsertedAtTop = [];
-
-var	fixUrls = __webpack_require__(34);
-
-module.exports = function(list, options) {
-	if (typeof DEBUG !== "undefined" && DEBUG) {
-		if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-	}
-
-	options = options || {};
-
-	options.attrs = typeof options.attrs === "object" ? options.attrs : {};
-
-	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-	// tags it will allow on a page
-	if (!options.singleton) options.singleton = isOldIE();
-
-	// By default, add <style> tags to the <head> element
-	if (!options.insertInto) options.insertInto = "head";
-
-	// By default, add <style> tags to the bottom of the target
-	if (!options.insertAt) options.insertAt = "bottom";
-
-	var styles = listToStyles(list, options);
-
-	addStylesToDom(styles, options);
-
-	return function update (newList) {
-		var mayRemove = [];
-
-		for (var i = 0; i < styles.length; i++) {
-			var item = styles[i];
-			var domStyle = stylesInDom[item.id];
-
-			domStyle.refs--;
-			mayRemove.push(domStyle);
-		}
-
-		if(newList) {
-			var newStyles = listToStyles(newList, options);
-			addStylesToDom(newStyles, options);
-		}
-
-		for (var i = 0; i < mayRemove.length; i++) {
-			var domStyle = mayRemove[i];
-
-			if(domStyle.refs === 0) {
-				for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
-
-				delete stylesInDom[domStyle.id];
-			}
-		}
-	};
-};
-
-function addStylesToDom (styles, options) {
-	for (var i = 0; i < styles.length; i++) {
-		var item = styles[i];
-		var domStyle = stylesInDom[item.id];
-
-		if(domStyle) {
-			domStyle.refs++;
-
-			for(var j = 0; j < domStyle.parts.length; j++) {
-				domStyle.parts[j](item.parts[j]);
-			}
-
-			for(; j < item.parts.length; j++) {
-				domStyle.parts.push(addStyle(item.parts[j], options));
-			}
-		} else {
-			var parts = [];
-
-			for(var j = 0; j < item.parts.length; j++) {
-				parts.push(addStyle(item.parts[j], options));
-			}
-
-			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
-		}
-	}
-}
-
-function listToStyles (list, options) {
-	var styles = [];
-	var newStyles = {};
-
-	for (var i = 0; i < list.length; i++) {
-		var item = list[i];
-		var id = options.base ? item[0] + options.base : item[0];
-		var css = item[1];
-		var media = item[2];
-		var sourceMap = item[3];
-		var part = {css: css, media: media, sourceMap: sourceMap};
-
-		if(!newStyles[id]) styles.push(newStyles[id] = {id: id, parts: [part]});
-		else newStyles[id].parts.push(part);
-	}
-
-	return styles;
-}
-
-function insertStyleElement (options, style) {
-	var target = getElement(options.insertInto)
-
-	if (!target) {
-		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
-	}
-
-	var lastStyleElementInsertedAtTop = stylesInsertedAtTop[stylesInsertedAtTop.length - 1];
-
-	if (options.insertAt === "top") {
-		if (!lastStyleElementInsertedAtTop) {
-			target.insertBefore(style, target.firstChild);
-		} else if (lastStyleElementInsertedAtTop.nextSibling) {
-			target.insertBefore(style, lastStyleElementInsertedAtTop.nextSibling);
-		} else {
-			target.appendChild(style);
-		}
-		stylesInsertedAtTop.push(style);
-	} else if (options.insertAt === "bottom") {
-		target.appendChild(style);
-	} else {
-		throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
-	}
-}
-
-function removeStyleElement (style) {
-	if (style.parentNode === null) return false;
-	style.parentNode.removeChild(style);
-
-	var idx = stylesInsertedAtTop.indexOf(style);
-	if(idx >= 0) {
-		stylesInsertedAtTop.splice(idx, 1);
-	}
-}
-
-function createStyleElement (options) {
-	var style = document.createElement("style");
-
-	options.attrs.type = "text/css";
-
-	addAttrs(style, options.attrs);
-	insertStyleElement(options, style);
-
-	return style;
-}
-
-function createLinkElement (options) {
-	var link = document.createElement("link");
-
-	options.attrs.type = "text/css";
-	options.attrs.rel = "stylesheet";
-
-	addAttrs(link, options.attrs);
-	insertStyleElement(options, link);
-
-	return link;
-}
-
-function addAttrs (el, attrs) {
-	Object.keys(attrs).forEach(function (key) {
-		el.setAttribute(key, attrs[key]);
-	});
-}
-
-function addStyle (obj, options) {
-	var style, update, remove, result;
-
-	// If a transform function was defined, run it on the css
-	if (options.transform && obj.css) {
-	    result = options.transform(obj.css);
-
-	    if (result) {
-	    	// If transform returns a value, use that instead of the original css.
-	    	// This allows running runtime transformations on the css.
-	    	obj.css = result;
-	    } else {
-	    	// If the transform function returns a falsy value, don't add this css.
-	    	// This allows conditional loading of css
-	    	return function() {
-	    		// noop
-	    	};
-	    }
-	}
-
-	if (options.singleton) {
-		var styleIndex = singletonCounter++;
-
-		style = singleton || (singleton = createStyleElement(options));
-
-		update = applyToSingletonTag.bind(null, style, styleIndex, false);
-		remove = applyToSingletonTag.bind(null, style, styleIndex, true);
-
-	} else if (
-		obj.sourceMap &&
-		typeof URL === "function" &&
-		typeof URL.createObjectURL === "function" &&
-		typeof URL.revokeObjectURL === "function" &&
-		typeof Blob === "function" &&
-		typeof btoa === "function"
-	) {
-		style = createLinkElement(options);
-		update = updateLink.bind(null, style, options);
-		remove = function () {
-			removeStyleElement(style);
-
-			if(style.href) URL.revokeObjectURL(style.href);
-		};
-	} else {
-		style = createStyleElement(options);
-		update = applyToTag.bind(null, style);
-		remove = function () {
-			removeStyleElement(style);
-		};
-	}
-
-	update(obj);
-
-	return function updateStyle (newObj) {
-		if (newObj) {
-			if (
-				newObj.css === obj.css &&
-				newObj.media === obj.media &&
-				newObj.sourceMap === obj.sourceMap
-			) {
-				return;
-			}
-
-			update(obj = newObj);
-		} else {
-			remove();
-		}
-	};
-}
-
-var replaceText = (function () {
-	var textStore = [];
-
-	return function (index, replacement) {
-		textStore[index] = replacement;
-
-		return textStore.filter(Boolean).join('\n');
-	};
-})();
-
-function applyToSingletonTag (style, index, remove, obj) {
-	var css = remove ? "" : obj.css;
-
-	if (style.styleSheet) {
-		style.styleSheet.cssText = replaceText(index, css);
-	} else {
-		var cssNode = document.createTextNode(css);
-		var childNodes = style.childNodes;
-
-		if (childNodes[index]) style.removeChild(childNodes[index]);
-
-		if (childNodes.length) {
-			style.insertBefore(cssNode, childNodes[index]);
-		} else {
-			style.appendChild(cssNode);
-		}
-	}
-}
-
-function applyToTag (style, obj) {
-	var css = obj.css;
-	var media = obj.media;
-
-	if(media) {
-		style.setAttribute("media", media)
-	}
-
-	if(style.styleSheet) {
-		style.styleSheet.cssText = css;
-	} else {
-		while(style.firstChild) {
-			style.removeChild(style.firstChild);
-		}
-
-		style.appendChild(document.createTextNode(css));
-	}
-}
-
-function updateLink (link, options, obj) {
-	var css = obj.css;
-	var sourceMap = obj.sourceMap;
-
-	/*
-		If convertToAbsoluteUrls isn't defined, but sourcemaps are enabled
-		and there is no publicPath defined then lets turn convertToAbsoluteUrls
-		on by default.  Otherwise default to the convertToAbsoluteUrls option
-		directly
-	*/
-	var autoFixUrls = options.convertToAbsoluteUrls === undefined && sourceMap;
-
-	if (options.convertToAbsoluteUrls || autoFixUrls) {
-		css = fixUrls(css);
-	}
-
-	if (sourceMap) {
-		// http://stackoverflow.com/a/26603875
-		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-	}
-
-	var blob = new Blob([css], { type: "text/css" });
-
-	var oldSrc = link.href;
-
-	link.href = URL.createObjectURL(blob);
-
-	if(oldSrc) URL.revokeObjectURL(oldSrc);
-}
-
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports) {
-
-
-/**
- * When source maps are enabled, `style-loader` uses a link element with a data-uri to
- * embed the css on the page. This breaks all relative urls because now they are relative to a
- * bundle instead of the current page.
- *
- * One solution is to only use full urls, but that may be impossible.
- *
- * Instead, this function "fixes" the relative urls to be absolute according to the current page location.
- *
- * A rudimentary test suite is located at `test/fixUrls.js` and can be run via the `npm test` command.
- *
- */
-
-module.exports = function (css) {
-  // get current location
-  var location = typeof window !== "undefined" && window.location;
-
-  if (!location) {
-    throw new Error("fixUrls requires window.location");
-  }
-
-	// blank or null?
-	if (!css || typeof css !== "string") {
-	  return css;
-  }
-
-  var baseUrl = location.protocol + "//" + location.host;
-  var currentDir = baseUrl + location.pathname.replace(/\/[^\/]*$/, "/");
-
-	// convert each url(...)
-	/*
-	This regular expression is just a way to recursively match brackets within
-	a string.
-
-	 /url\s*\(  = Match on the word "url" with any whitespace after it and then a parens
-	   (  = Start a capturing group
-	     (?:  = Start a non-capturing group
-	         [^)(]  = Match anything that isn't a parentheses
-	         |  = OR
-	         \(  = Match a start parentheses
-	             (?:  = Start another non-capturing groups
-	                 [^)(]+  = Match anything that isn't a parentheses
-	                 |  = OR
-	                 \(  = Match a start parentheses
-	                     [^)(]*  = Match anything that isn't a parentheses
-	                 \)  = Match a end parentheses
-	             )  = End Group
-              *\) = Match anything and then a close parens
-          )  = Close non-capturing group
-          *  = Match anything
-       )  = Close capturing group
-	 \)  = Match a close parens
-
-	 /gi  = Get all matches, not the first.  Be case insensitive.
-	 */
-	var fixedCss = css.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi, function(fullMatch, origUrl) {
-		// strip quotes (if they exist)
-		var unquotedOrigUrl = origUrl
-			.trim()
-			.replace(/^"(.*)"$/, function(o, $1){ return $1; })
-			.replace(/^'(.*)'$/, function(o, $1){ return $1; });
-
-		// already a full url? no change
-		if (/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/)/i.test(unquotedOrigUrl)) {
-		  return fullMatch;
-		}
-
-		// convert the url to a full url
-		var newUrl;
-
-		if (unquotedOrigUrl.indexOf("//") === 0) {
-		  	//TODO: should we add protocol?
-			newUrl = unquotedOrigUrl;
-		} else if (unquotedOrigUrl.indexOf("/") === 0) {
-			// path should be relative to the base url
-			newUrl = baseUrl + unquotedOrigUrl; // already starts with '/'
-		} else {
-			// path should be relative to current directory
-			newUrl = currentDir + unquotedOrigUrl.replace(/^\.\//, ""); // Strip leading './'
-		}
-
-		// send back the fixed url(...)
-		return "url(" + JSON.stringify(newUrl) + ")";
-	});
-
-	// send back the fixed css
-	return fixedCss;
-};
-
-
-/***/ }),
-/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -33085,10 +32221,10 @@ module.exports = function (css) {
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(36)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(18)(module)))
 
 /***/ }),
-/* 36 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -33116,45 +32252,171 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 37 */,
-/* 38 */,
-/* 39 */,
-/* 40 */,
-/* 41 */,
-/* 42 */,
-/* 43 */,
-/* 44 */,
-/* 45 */,
-/* 46 */,
-/* 47 */,
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */
-/***/ (function(module, exports) {
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = "/fonts/vendor/vue-json-editor/img/jsoneditor-icons.svg?256e3abce3a61ba656dbb8f4967e3933";
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "row" }, [
+    _c("div", { staticClass: "col-xs-4" }, [
+      _c("div", { staticClass: "panel panel-default" }, [
+        _vm._m(0),
+        _vm._v(" "),
+        _c(
+          "table",
+          { staticClass: "table-responsive table table-striped table-hover" },
+          [
+            _c(
+              "tbody",
+              _vm._l(_vm.filteredLists, function(list) {
+                return _c(
+                  "router-link",
+                  {
+                    key: list.fileName,
+                    attrs: { tag: "tr", to: "/lists/" + list.fileName }
+                  },
+                  [_c("td", [_vm._v(_vm._s(list.name))])]
+                )
+              })
+            )
+          ]
+        )
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "col-xs-8" }, [_c("router-view")], 1)
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "panel-heading" }, [
+      _c("h3", { staticClass: "panel-title" }, [_vm._v("Lists")])
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-3ca050af", module.exports)
+  }
+}
 
 /***/ }),
-/* 58 */
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(21)
+/* template */
+var __vue_template__ = __webpack_require__(34)
+/* template functional */
+  var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/js/components/lists/show.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-52583c30", Component.options)
+  } else {
+    hotAPI.reload("data-v-52583c30", Component.options)
+' + '  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__store_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_json_editor__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_json_editor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue_json_editor__);
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  mounted: function mounted() {
+    this.refresh();
+  },
+
+  components: {
+    vueJsonEditor: __WEBPACK_IMPORTED_MODULE_1_vue_json_editor___default.a
+  },
+  data: function data() {
+    return {
+      list: null,
+      customToolbar: []
+    };
+  },
+
+  methods: {
+    refresh: function refresh() {
+      this.list = JSON.parse(__WEBPACK_IMPORTED_MODULE_0__store_js__["a" /* default */].loadFile(this.$route.params.name));
+    }
+  },
+  watch: {
+    '$route.params.name': function $routeParamsName() {
+      this.refresh();
+    }
+  }
+});
+
+/***/ }),
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(59)
+  __webpack_require__(23)
 }
-var normalizeComponent = __webpack_require__(0)
+var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(63)
+var __vue_script__ = __webpack_require__(27)
 /* template */
-var __vue_template__ = __webpack_require__(67)
+var __vue_template__ = __webpack_require__(33)
 /* template functional */
   var __vue_template_functional__ = false
 /* styles */
@@ -33194,17 +32456,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 59 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(60);
+var content = __webpack_require__(24);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(61)("3e874287", content, false);
+var update = __webpack_require__(25)("3e874287", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -33220,10 +32482,10 @@ if(false) {
 }
 
 /***/ }),
-/* 60 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(27)(undefined);
+exports = module.exports = __webpack_require__(4)(undefined);
 // imports
 
 
@@ -33234,7 +32496,7 @@ exports.push([module.i, "\n.ace_line_group {\n  text-align: left;\n}\n.json-edit
 
 
 /***/ }),
-/* 61 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -33253,7 +32515,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(62)
+var listToStyles = __webpack_require__(26)
 
 /*
 type StyleObject = {
@@ -33455,7 +32717,7 @@ function applyToTag (styleElement, obj) {
 
 
 /***/ }),
-/* 62 */
+/* 26 */
 /***/ (function(module, exports) {
 
 /**
@@ -33488,14 +32750,14 @@ module.exports = function listToStyles (parentId, list) {
 
 
 /***/ }),
-/* 63 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__assets_jsoneditor_css__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__assets_jsoneditor_css__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__assets_jsoneditor_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__assets_jsoneditor_css__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__assets_jsoneditor__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__assets_jsoneditor__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__assets_jsoneditor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__assets_jsoneditor__);
 //
 //
@@ -33559,13 +32821,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 64 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(65);
+var content = __webpack_require__(29);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -33573,7 +32835,7 @@ var transform;
 var options = {}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(33)(content, options);
+var update = __webpack_require__(30)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -33590,21 +32852,475 @@ if(false) {
 }
 
 /***/ }),
-/* 65 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(27)(undefined);
+exports = module.exports = __webpack_require__(4)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, "/* reset styling (prevent conflicts with bootstrap, materialize.css, etc.) */\r\n\r\ndiv.jsoneditor .jsoneditor-search input {\r\n  height: auto;\r\n  border: inherit;\r\n}\r\n\r\ndiv.jsoneditor .jsoneditor-search input:focus {\r\n  border: none !important;\r\n  box-shadow: none !important;\r\n}\r\n\r\ndiv.jsoneditor table {\r\n  border-collapse: collapse;\r\n  width: auto;\r\n}\r\n\r\ndiv.jsoneditor td,\r\ndiv.jsoneditor th {\r\n  padding: 0;\r\n  display: table-cell;\r\n  text-align: left;\r\n  vertical-align: inherit;\r\n  border-radius: inherit;\r\n}\r\n\r\n\r\ndiv.jsoneditor-field,\r\ndiv.jsoneditor-value,\r\ndiv.jsoneditor-readonly {\r\n  border: 1px solid transparent;\r\n  min-height: 16px;\r\n  min-width: 32px;\r\n  padding: 2px;\r\n  margin: 1px;\r\n  word-wrap: break-word;\r\n  float: left;\r\n}\r\n\r\n/* adjust margin of p elements inside editable divs, needed for Opera, IE */\r\n\r\ndiv.jsoneditor-field p,\r\ndiv.jsoneditor-value p {\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor-value {\r\n  word-break: break-word;\r\n}\r\n\r\ndiv.jsoneditor-readonly {\r\n  min-width: 16px;\r\n  color: gray;\r\n}\r\n\r\ndiv.jsoneditor-empty {\r\n  border-color: lightgray;\r\n  border-style: dashed;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-empty::after,\r\ndiv.jsoneditor-value.jsoneditor-empty::after {\r\n  pointer-events: none;\r\n  color: lightgray;\r\n  font-size: 8pt;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-empty::after {\r\n  content: \"field\";\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-empty::after {\r\n  content: \"value\";\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-url,\r\na.jsoneditor-value.jsoneditor-url {\r\n  color: green;\r\n  text-decoration: underline;\r\n}\r\n\r\na.jsoneditor-value.jsoneditor-url {\r\n  display: inline-block;\r\n  padding: 2px;\r\n  margin: 2px;\r\n}\r\n\r\na.jsoneditor-value.jsoneditor-url:hover,\r\na.jsoneditor-value.jsoneditor-url:focus {\r\n  color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor td.jsoneditor-separator {\r\n  padding: 3px 0;\r\n  vertical-align: top;\r\n  color: gray;\r\n}\r\n\r\ndiv.jsoneditor-field[contenteditable=true]:focus,\r\ndiv.jsoneditor-field[contenteditable=true]:hover,\r\ndiv.jsoneditor-value[contenteditable=true]:focus,\r\ndiv.jsoneditor-value[contenteditable=true]:hover,\r\ndiv.jsoneditor-field.jsoneditor-highlight,\r\ndiv.jsoneditor-value.jsoneditor-highlight {\r\n  background-color: #FFFFAB;\r\n  border: 1px solid yellow;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-highlight-active,\r\ndiv.jsoneditor-field.jsoneditor-highlight-active:focus,\r\ndiv.jsoneditor-field.jsoneditor-highlight-active:hover,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active:focus,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active:hover {\r\n  background-color: #ffee00;\r\n  border: 1px solid #ffc700;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-string {\r\n  color: #008000;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-object,\r\ndiv.jsoneditor-value.jsoneditor-array {\r\n  min-width: 16px;\r\n  color: #808080;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-number {\r\n  color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-boolean {\r\n  color: #ff8c00;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-null {\r\n  color: #004ED0;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-invalid {\r\n  color: #000000;\r\n}\r\n\r\ndiv.jsoneditor-tree button {\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0;\r\n  border: none;\r\n  cursor: pointer;\r\n  background: transparent url(" + __webpack_require__(57) + ");\r\n}\r\n\r\ndiv.jsoneditor-mode-view tr.jsoneditor-expandable td.jsoneditor-tree,\r\ndiv.jsoneditor-mode-form tr.jsoneditor-expandable td.jsoneditor-tree {\r\n  cursor: pointer;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-collapsed {\r\n  background-position: 0 -48px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-expanded {\r\n  background-position: 0 -72px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu {\r\n  background-position: -48px -72px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu:hover,\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu:focus,\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu.jsoneditor-selected,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-contextmenu {\r\n  background-position: -48px -48px;\r\n}\r\n\r\ndiv.jsoneditor-tree *:focus {\r\n  outline: none;\r\n}\r\n\r\ndiv.jsoneditor-tree button:focus {\r\n  /* TODO: nice outline for buttons with focus\r\n  outline: #97B0F8 solid 2px;\r\n  box-shadow: 0 0 8px #97B0F8;\r\n  */\r\n  background-color: #f5f5f5;\r\n  outline: #e5e5e5 solid 1px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-invisible {\r\n  visibility: hidden;\r\n  background: none;\r\n}\r\n\r\ndiv.jsoneditor {\r\n  color: #1A1A1A;\r\n  border: 1px solid #3883fa;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  position: relative;\r\n  padding: 0;\r\n  line-height: 100%;\r\n}\r\n\r\ndiv.jsoneditor-tree table.jsoneditor-tree {\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  width: 100%;\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor-outer {\r\n  position: static;\r\n  width: 100%;\r\n  height: 100%;\r\n  margin: -35px 0 0 0;\r\n  padding: 35px 0 0 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n}\r\n\r\ntextarea.jsoneditor-text,\r\n.ace-jsoneditor {\r\n  min-height: 150px;\r\n}\r\n\r\ndiv.jsoneditor-tree {\r\n  width: 100%;\r\n  height: 100%;\r\n  position: relative;\r\n  overflow: auto;\r\n}\r\n\r\ntextarea.jsoneditor-text {\r\n  width: 100%;\r\n  height: 100%;\r\n  margin: 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  outline-width: 0;\r\n  border: none;\r\n  background-color: white;\r\n  resize: none;\r\n}\r\n\r\ntr.jsoneditor-highlight,\r\ntr.jsoneditor-selected {\r\n  background-color: #e6e6e6;\r\n}\r\n\r\ntr.jsoneditor-selected button.jsoneditor-dragarea,\r\ntr.jsoneditor-selected button.jsoneditor-contextmenu {\r\n  visibility: hidden;\r\n}\r\n\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-dragarea,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-contextmenu {\r\n  visibility: visible;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea {\r\n  background: url(" + __webpack_require__(57) + ") -72px -72px;\r\n  cursor: move;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea:hover,\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea:focus,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-dragarea {\r\n  background-position: -72px -48px;\r\n}\r\n\r\ndiv.jsoneditor tr,\r\ndiv.jsoneditor th,\r\ndiv.jsoneditor td {\r\n  padding: 0;\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor td {\r\n  vertical-align: top;\r\n}\r\n\r\ndiv.jsoneditor td.jsoneditor-tree {\r\n  vertical-align: top;\r\n}\r\n\r\ndiv.jsoneditor-field,\r\ndiv.jsoneditor-value,\r\ndiv.jsoneditor td,\r\ndiv.jsoneditor th,\r\ndiv.jsoneditor textarea,\r\n.jsoneditor-schema-error {\r\n  font-family: droid sans mono, consolas, monospace, courier new, courier, sans-serif;\r\n  font-size: 10pt;\r\n  color: #1A1A1A;\r\n}\r\n\r\n/* popover */\r\n\r\n.jsoneditor-schema-error {\r\n  cursor: default;\r\n  display: inline-block;\r\n  /*font-family: arial, sans-serif;*/\r\n  height: 24px;\r\n  line-height: 24px;\r\n  position: relative;\r\n  text-align: center;\r\n  width: 24px;\r\n}\r\n\r\ndiv.jsoneditor-tree .jsoneditor-schema-error {\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(57) + ")  -168px -48px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover {\r\n  background-color: #4c4c4c;\r\n  border-radius: 3px;\r\n  box-shadow: 0 0 5px rgba(0,0,0,0.4);\r\n  color: #fff;\r\n  display: none;\r\n  padding: 7px 10px;\r\n  position: absolute;\r\n  width: 200px;\r\n  z-index: 4;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-above {\r\n  bottom: 32px;\r\n  left: -98px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-below {\r\n  top: 32px;\r\n  left: -98px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-left {\r\n  top: -7px;\r\n  right: 32px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-right {\r\n  top: -7px;\r\n  left: 32px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover:before {\r\n  border-right: 7px solid transparent;\r\n  border-left: 7px solid transparent;\r\n  content: '';\r\n  display: block;\r\n  left: 50%;\r\n  margin-left: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-above:before {\r\n  border-top: 7px solid #4c4c4c;\r\n  bottom: -7px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-below:before {\r\n  border-bottom: 7px solid #4c4c4c;\r\n  top: -7px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-left:before {\r\n  border-left: 7px solid #4c4c4c;\r\n  border-top: 7px solid transparent;\r\n  border-bottom: 7px solid transparent;\r\n  content: '';\r\n  top: 19px;\r\n  right: -14px;\r\n  left: inherit;\r\n  margin-left: inherit;\r\n  margin-top: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-right:before {\r\n  border-right: 7px solid #4c4c4c;\r\n  border-top: 7px solid transparent;\r\n  border-bottom: 7px solid transparent;\r\n  content: '';\r\n  top: 19px;\r\n  left: -14px;\r\n  margin-left: inherit;\r\n  margin-top: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error:hover .jsoneditor-popover,\r\n.jsoneditor-schema-error:focus .jsoneditor-popover {\r\n  display: block;\r\n  -webkit-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n  -moz-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n  -ms-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n}\r\n\r\n@-webkit-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@-moz-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@-ms-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n/*@-webkit-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/*@-moz-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/*@-ms-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/* JSON schema errors displayed at the bottom of the editor in mode text and code */\r\n\r\n.jsoneditor .jsoneditor-text-errors {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  background-color: #ffef8b;\r\n  border-top: 1px solid #ffd700;\r\n}\r\n\r\n.jsoneditor .jsoneditor-text-errors td {\r\n  padding: 3px 6px;\r\n  vertical-align: middle;\r\n}\r\n\r\n.jsoneditor-text-errors .jsoneditor-schema-error {\r\n  border: none;\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(57) + ")  -168px -48px;\r\n}\r\n/* ContextMenu - main menu */\r\n\r\ndiv.jsoneditor-contextmenu-root {\r\n  position: relative;\r\n  width: 0;\r\n  height: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu {\r\n  position: absolute;\r\n  box-sizing: content-box;\r\n  z-index: 99999;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul,\r\ndiv.jsoneditor-contextmenu li {\r\n  box-sizing: content-box;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul {\r\n  position: relative;\r\n  left: 0;\r\n  top: 0;\r\n  width: 124px;\r\n  background: white;\r\n  border: 1px solid #d3d3d3;\r\n  box-shadow: 2px 2px 12px rgba(128, 128, 128, 0.3);\r\n  list-style: none;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button {\r\n  padding: 0;\r\n  margin: 0;\r\n  width: 124px;\r\n  height: 24px;\r\n  border: none;\r\n  cursor: pointer;\r\n  color: #4d4d4d;\r\n  background: transparent;\r\n  font-size: 10pt;\r\n  font-family: arial, sans-serif;\r\n  box-sizing: border-box;\r\n  line-height: 26px;\r\n  text-align: left;\r\n}\r\n\r\n/* Fix button padding in firefox */\r\n\r\ndiv.jsoneditor-contextmenu ul li button::-moz-focus-inner {\r\n  padding: 0;\r\n  border: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button:hover,\r\ndiv.jsoneditor-contextmenu ul li button:focus {\r\n  color: #1a1a1a;\r\n  background-color: #f5f5f5;\r\n  outline: none;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-default {\r\n  width: 92px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand {\r\n  float: right;\r\n  width: 32px;\r\n  height: 24px;\r\n  border-left: 1px solid #e5e5e5;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu div.jsoneditor-icon {\r\n  float: left;\r\n  width: 24px;\r\n  height: 24px;\r\n  border: none;\r\n  padding: 0;\r\n  margin: 0;\r\n  background-image: url(" + __webpack_require__(57) + ");\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button div.jsoneditor-expand {\r\n  float: right;\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(57) + ") 0 -72px;\r\n  opacity: 0.4;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button:hover div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button:focus div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li.jsoneditor-selected div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand:hover div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand:focus div.jsoneditor-expand {\r\n  opacity: 1;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu div.jsoneditor-separator {\r\n  height: 0;\r\n  border-top: 1px solid #e5e5e5;\r\n  padding-top: 5px;\r\n  margin-top: 5px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove > div.jsoneditor-icon {\r\n  background-position: -24px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove:focus > div.jsoneditor-icon {\r\n  background-position: -24px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append > div.jsoneditor-icon {\r\n  background-position: 0 -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append:focus > div.jsoneditor-icon {\r\n  background-position: 0 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert > div.jsoneditor-icon {\r\n  background-position: 0 -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert:focus > div.jsoneditor-icon {\r\n  background-position: 0 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate > div.jsoneditor-icon {\r\n  background-position: -48px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate:focus > div.jsoneditor-icon {\r\n  background-position: -48px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc > div.jsoneditor-icon {\r\n  background-position: -168px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc:focus > div.jsoneditor-icon {\r\n  background-position: -168px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc > div.jsoneditor-icon {\r\n  background-position: -192px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc:focus > div.jsoneditor-icon {\r\n  background-position: -192px 0;\r\n}\r\n\r\n/* ContextMenu - sub menu */\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected:hover,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected:focus {\r\n  color: white;\r\n  background-color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li {\r\n  overflow: hidden;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li ul {\r\n  display: none;\r\n  position: relative;\r\n  left: -10px;\r\n  top: 0;\r\n  border: none;\r\n  box-shadow: inset 0 0 10px rgba(128, 128, 128, 0.5);\r\n  padding: 0 10px;\r\n  /* TODO: transition is not supported on IE8-9 */\r\n  -webkit-transition: all 0.3s ease-out;\r\n  -moz-transition: all 0.3s ease-out;\r\n  -o-transition: all 0.3s ease-out;\r\n  transition: all 0.3s ease-out;\r\n}\r\n\r\n\r\n\r\ndiv.jsoneditor-contextmenu ul li ul li button {\r\n  padding-left: 24px;\r\n  animation: all ease-in-out 1s;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li ul li button:hover,\r\ndiv.jsoneditor-contextmenu ul li ul li button:focus {\r\n  background-color: #f5f5f5;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string > div.jsoneditor-icon {\r\n  background-position: -144px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -144px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto > div.jsoneditor-icon {\r\n  background-position: -120px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -120px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object > div.jsoneditor-icon {\r\n  background-position: -72px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -72px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array > div.jsoneditor-icon {\r\n  background-position: -96px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -96px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-modes > div.jsoneditor-icon {\r\n  background-image: none;\r\n  width: 6px;\r\n}\r\ndiv.jsoneditor-menu {\r\n  width: 100%;\r\n  height: 35px;\r\n  padding: 2px;\r\n  margin: 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  color: white;\r\n  background-color: #3883fa;\r\n  border-bottom: 1px solid #3883fa;\r\n}\r\n\r\ndiv.jsoneditor-menu > button,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button {\r\n  width: 26px;\r\n  height: 26px;\r\n  margin: 2px;\r\n  padding: 0;\r\n  border-radius: 2px;\r\n  border: 1px solid transparent;\r\n  background: transparent url(" + __webpack_require__(57) + ");\r\n  color: white;\r\n  opacity: 0.8;\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  float: left;\r\n}\r\n\r\ndiv.jsoneditor-menu > button:hover,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:hover {\r\n  background-color: rgba(255,255,255,0.2);\r\n  border: 1px solid rgba(255,255,255,0.4);\r\n}\r\n\r\ndiv.jsoneditor-menu > button:focus,\r\ndiv.jsoneditor-menu > button:active,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:focus,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:active {\r\n  background-color: rgba(255,255,255,0.3);\r\n}\r\n\r\ndiv.jsoneditor-menu > button:disabled,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:disabled {\r\n  opacity: 0.5;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-collapse-all {\r\n  background-position: 0 -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-expand-all {\r\n  background-position: 0 -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-undo {\r\n  background-position: -24px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-undo:disabled {\r\n  background-position: -24px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-redo {\r\n  background-position: -48px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-redo:disabled {\r\n  background-position: -48px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-compact {\r\n  background-position: -72px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-format {\r\n  background-position: -72px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > div.jsoneditor-modes {\r\n  display: inline-block;\r\n  float: left;\r\n}\r\n\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button {\r\n  background-image: none;\r\n  width: auto;\r\n  padding-left: 6px;\r\n  padding-right: 6px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-separator,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button.jsoneditor-separator {\r\n  margin-left: 10px;\r\n}\r\n\r\ndiv.jsoneditor-menu a {\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  color: white;\r\n  opacity: 0.8;\r\n  vertical-align: middle;\r\n}\r\n\r\ndiv.jsoneditor-menu a:hover {\r\n  opacity: 1;\r\n}\r\n\r\ndiv.jsoneditor-menu a.jsoneditor-poweredBy {\r\n  font-size: 8pt;\r\n  position: absolute;\r\n  right: 0;\r\n  top: 0;\r\n  padding: 10px;\r\n}\r\ntable.jsoneditor-search input,\r\ntable.jsoneditor-search div.jsoneditor-results {\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  color: #1A1A1A;\r\n  background: transparent;\r\n  /* For Firefox */\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-results {\r\n  color: white;\r\n  padding-right: 5px;\r\n  line-height: 24px;\r\n}\r\n\r\ntable.jsoneditor-search {\r\n  position: absolute;\r\n  right: 4px;\r\n  top: 4px;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-frame {\r\n  border: 1px solid transparent;\r\n  background-color: white;\r\n  padding: 0 2px;\r\n  margin: 0;\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-frame table {\r\n  border-collapse: collapse;\r\n}\r\n\r\ntable.jsoneditor-search input {\r\n  width: 120px;\r\n  border: none;\r\n  outline: none;\r\n  margin: 1px;\r\n  line-height: 20px;\r\n}\r\n\r\ntable.jsoneditor-search button {\r\n  width: 16px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0;\r\n  border: none;\r\n  background: url(" + __webpack_require__(57) + ");\r\n  vertical-align: top;\r\n}\r\n\r\ntable.jsoneditor-search button:hover {\r\n  background-color: transparent;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-refresh {\r\n  width: 18px;\r\n  background-position: -99px -73px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-next {\r\n  cursor: pointer;\r\n  background-position: -124px -73px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-next:hover {\r\n  background-position: -124px -49px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-previous {\r\n  cursor: pointer;\r\n  background-position: -148px -73px;\r\n  margin-right: 2px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-previous:hover {\r\n  background-position: -148px -49px;\r\n}", ""]);
+exports.push([module.i, "/* reset styling (prevent conflicts with bootstrap, materialize.css, etc.) */\r\n\r\ndiv.jsoneditor .jsoneditor-search input {\r\n  height: auto;\r\n  border: inherit;\r\n}\r\n\r\ndiv.jsoneditor .jsoneditor-search input:focus {\r\n  border: none !important;\r\n  box-shadow: none !important;\r\n}\r\n\r\ndiv.jsoneditor table {\r\n  border-collapse: collapse;\r\n  width: auto;\r\n}\r\n\r\ndiv.jsoneditor td,\r\ndiv.jsoneditor th {\r\n  padding: 0;\r\n  display: table-cell;\r\n  text-align: left;\r\n  vertical-align: inherit;\r\n  border-radius: inherit;\r\n}\r\n\r\n\r\ndiv.jsoneditor-field,\r\ndiv.jsoneditor-value,\r\ndiv.jsoneditor-readonly {\r\n  border: 1px solid transparent;\r\n  min-height: 16px;\r\n  min-width: 32px;\r\n  padding: 2px;\r\n  margin: 1px;\r\n  word-wrap: break-word;\r\n  float: left;\r\n}\r\n\r\n/* adjust margin of p elements inside editable divs, needed for Opera, IE */\r\n\r\ndiv.jsoneditor-field p,\r\ndiv.jsoneditor-value p {\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor-value {\r\n  word-break: break-word;\r\n}\r\n\r\ndiv.jsoneditor-readonly {\r\n  min-width: 16px;\r\n  color: gray;\r\n}\r\n\r\ndiv.jsoneditor-empty {\r\n  border-color: lightgray;\r\n  border-style: dashed;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-empty::after,\r\ndiv.jsoneditor-value.jsoneditor-empty::after {\r\n  pointer-events: none;\r\n  color: lightgray;\r\n  font-size: 8pt;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-empty::after {\r\n  content: \"field\";\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-empty::after {\r\n  content: \"value\";\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-url,\r\na.jsoneditor-value.jsoneditor-url {\r\n  color: green;\r\n  text-decoration: underline;\r\n}\r\n\r\na.jsoneditor-value.jsoneditor-url {\r\n  display: inline-block;\r\n  padding: 2px;\r\n  margin: 2px;\r\n}\r\n\r\na.jsoneditor-value.jsoneditor-url:hover,\r\na.jsoneditor-value.jsoneditor-url:focus {\r\n  color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor td.jsoneditor-separator {\r\n  padding: 3px 0;\r\n  vertical-align: top;\r\n  color: gray;\r\n}\r\n\r\ndiv.jsoneditor-field[contenteditable=true]:focus,\r\ndiv.jsoneditor-field[contenteditable=true]:hover,\r\ndiv.jsoneditor-value[contenteditable=true]:focus,\r\ndiv.jsoneditor-value[contenteditable=true]:hover,\r\ndiv.jsoneditor-field.jsoneditor-highlight,\r\ndiv.jsoneditor-value.jsoneditor-highlight {\r\n  background-color: #FFFFAB;\r\n  border: 1px solid yellow;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-highlight-active,\r\ndiv.jsoneditor-field.jsoneditor-highlight-active:focus,\r\ndiv.jsoneditor-field.jsoneditor-highlight-active:hover,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active:focus,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active:hover {\r\n  background-color: #ffee00;\r\n  border: 1px solid #ffc700;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-string {\r\n  color: #008000;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-object,\r\ndiv.jsoneditor-value.jsoneditor-array {\r\n  min-width: 16px;\r\n  color: #808080;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-number {\r\n  color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-boolean {\r\n  color: #ff8c00;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-null {\r\n  color: #004ED0;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-invalid {\r\n  color: #000000;\r\n}\r\n\r\ndiv.jsoneditor-tree button {\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0;\r\n  border: none;\r\n  cursor: pointer;\r\n  background: transparent url(" + __webpack_require__(0) + ");\r\n}\r\n\r\ndiv.jsoneditor-mode-view tr.jsoneditor-expandable td.jsoneditor-tree,\r\ndiv.jsoneditor-mode-form tr.jsoneditor-expandable td.jsoneditor-tree {\r\n  cursor: pointer;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-collapsed {\r\n  background-position: 0 -48px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-expanded {\r\n  background-position: 0 -72px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu {\r\n  background-position: -48px -72px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu:hover,\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu:focus,\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu.jsoneditor-selected,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-contextmenu {\r\n  background-position: -48px -48px;\r\n}\r\n\r\ndiv.jsoneditor-tree *:focus {\r\n  outline: none;\r\n}\r\n\r\ndiv.jsoneditor-tree button:focus {\r\n  /* TODO: nice outline for buttons with focus\r\n  outline: #97B0F8 solid 2px;\r\n  box-shadow: 0 0 8px #97B0F8;\r\n  */\r\n  background-color: #f5f5f5;\r\n  outline: #e5e5e5 solid 1px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-invisible {\r\n  visibility: hidden;\r\n  background: none;\r\n}\r\n\r\ndiv.jsoneditor {\r\n  color: #1A1A1A;\r\n  border: 1px solid #3883fa;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  position: relative;\r\n  padding: 0;\r\n  line-height: 100%;\r\n}\r\n\r\ndiv.jsoneditor-tree table.jsoneditor-tree {\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  width: 100%;\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor-outer {\r\n  position: static;\r\n  width: 100%;\r\n  height: 100%;\r\n  margin: -35px 0 0 0;\r\n  padding: 35px 0 0 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n}\r\n\r\ntextarea.jsoneditor-text,\r\n.ace-jsoneditor {\r\n  min-height: 150px;\r\n}\r\n\r\ndiv.jsoneditor-tree {\r\n  width: 100%;\r\n  height: 100%;\r\n  position: relative;\r\n  overflow: auto;\r\n}\r\n\r\ntextarea.jsoneditor-text {\r\n  width: 100%;\r\n  height: 100%;\r\n  margin: 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  outline-width: 0;\r\n  border: none;\r\n  background-color: white;\r\n  resize: none;\r\n}\r\n\r\ntr.jsoneditor-highlight,\r\ntr.jsoneditor-selected {\r\n  background-color: #e6e6e6;\r\n}\r\n\r\ntr.jsoneditor-selected button.jsoneditor-dragarea,\r\ntr.jsoneditor-selected button.jsoneditor-contextmenu {\r\n  visibility: hidden;\r\n}\r\n\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-dragarea,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-contextmenu {\r\n  visibility: visible;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea {\r\n  background: url(" + __webpack_require__(0) + ") -72px -72px;\r\n  cursor: move;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea:hover,\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea:focus,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-dragarea {\r\n  background-position: -72px -48px;\r\n}\r\n\r\ndiv.jsoneditor tr,\r\ndiv.jsoneditor th,\r\ndiv.jsoneditor td {\r\n  padding: 0;\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor td {\r\n  vertical-align: top;\r\n}\r\n\r\ndiv.jsoneditor td.jsoneditor-tree {\r\n  vertical-align: top;\r\n}\r\n\r\ndiv.jsoneditor-field,\r\ndiv.jsoneditor-value,\r\ndiv.jsoneditor td,\r\ndiv.jsoneditor th,\r\ndiv.jsoneditor textarea,\r\n.jsoneditor-schema-error {\r\n  font-family: droid sans mono, consolas, monospace, courier new, courier, sans-serif;\r\n  font-size: 10pt;\r\n  color: #1A1A1A;\r\n}\r\n\r\n/* popover */\r\n\r\n.jsoneditor-schema-error {\r\n  cursor: default;\r\n  display: inline-block;\r\n  /*font-family: arial, sans-serif;*/\r\n  height: 24px;\r\n  line-height: 24px;\r\n  position: relative;\r\n  text-align: center;\r\n  width: 24px;\r\n}\r\n\r\ndiv.jsoneditor-tree .jsoneditor-schema-error {\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(0) + ")  -168px -48px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover {\r\n  background-color: #4c4c4c;\r\n  border-radius: 3px;\r\n  box-shadow: 0 0 5px rgba(0,0,0,0.4);\r\n  color: #fff;\r\n  display: none;\r\n  padding: 7px 10px;\r\n  position: absolute;\r\n  width: 200px;\r\n  z-index: 4;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-above {\r\n  bottom: 32px;\r\n  left: -98px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-below {\r\n  top: 32px;\r\n  left: -98px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-left {\r\n  top: -7px;\r\n  right: 32px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-right {\r\n  top: -7px;\r\n  left: 32px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover:before {\r\n  border-right: 7px solid transparent;\r\n  border-left: 7px solid transparent;\r\n  content: '';\r\n  display: block;\r\n  left: 50%;\r\n  margin-left: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-above:before {\r\n  border-top: 7px solid #4c4c4c;\r\n  bottom: -7px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-below:before {\r\n  border-bottom: 7px solid #4c4c4c;\r\n  top: -7px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-left:before {\r\n  border-left: 7px solid #4c4c4c;\r\n  border-top: 7px solid transparent;\r\n  border-bottom: 7px solid transparent;\r\n  content: '';\r\n  top: 19px;\r\n  right: -14px;\r\n  left: inherit;\r\n  margin-left: inherit;\r\n  margin-top: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-right:before {\r\n  border-right: 7px solid #4c4c4c;\r\n  border-top: 7px solid transparent;\r\n  border-bottom: 7px solid transparent;\r\n  content: '';\r\n  top: 19px;\r\n  left: -14px;\r\n  margin-left: inherit;\r\n  margin-top: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error:hover .jsoneditor-popover,\r\n.jsoneditor-schema-error:focus .jsoneditor-popover {\r\n  display: block;\r\n  -webkit-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n  -moz-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n  -ms-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n}\r\n\r\n@-webkit-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@-moz-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@-ms-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n/*@-webkit-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/*@-moz-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/*@-ms-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/* JSON schema errors displayed at the bottom of the editor in mode text and code */\r\n\r\n.jsoneditor .jsoneditor-text-errors {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  background-color: #ffef8b;\r\n  border-top: 1px solid #ffd700;\r\n}\r\n\r\n.jsoneditor .jsoneditor-text-errors td {\r\n  padding: 3px 6px;\r\n  vertical-align: middle;\r\n}\r\n\r\n.jsoneditor-text-errors .jsoneditor-schema-error {\r\n  border: none;\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(0) + ")  -168px -48px;\r\n}\r\n/* ContextMenu - main menu */\r\n\r\ndiv.jsoneditor-contextmenu-root {\r\n  position: relative;\r\n  width: 0;\r\n  height: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu {\r\n  position: absolute;\r\n  box-sizing: content-box;\r\n  z-index: 99999;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul,\r\ndiv.jsoneditor-contextmenu li {\r\n  box-sizing: content-box;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul {\r\n  position: relative;\r\n  left: 0;\r\n  top: 0;\r\n  width: 124px;\r\n  background: white;\r\n  border: 1px solid #d3d3d3;\r\n  box-shadow: 2px 2px 12px rgba(128, 128, 128, 0.3);\r\n  list-style: none;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button {\r\n  padding: 0;\r\n  margin: 0;\r\n  width: 124px;\r\n  height: 24px;\r\n  border: none;\r\n  cursor: pointer;\r\n  color: #4d4d4d;\r\n  background: transparent;\r\n  font-size: 10pt;\r\n  font-family: arial, sans-serif;\r\n  box-sizing: border-box;\r\n  line-height: 26px;\r\n  text-align: left;\r\n}\r\n\r\n/* Fix button padding in firefox */\r\n\r\ndiv.jsoneditor-contextmenu ul li button::-moz-focus-inner {\r\n  padding: 0;\r\n  border: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button:hover,\r\ndiv.jsoneditor-contextmenu ul li button:focus {\r\n  color: #1a1a1a;\r\n  background-color: #f5f5f5;\r\n  outline: none;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-default {\r\n  width: 92px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand {\r\n  float: right;\r\n  width: 32px;\r\n  height: 24px;\r\n  border-left: 1px solid #e5e5e5;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu div.jsoneditor-icon {\r\n  float: left;\r\n  width: 24px;\r\n  height: 24px;\r\n  border: none;\r\n  padding: 0;\r\n  margin: 0;\r\n  background-image: url(" + __webpack_require__(0) + ");\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button div.jsoneditor-expand {\r\n  float: right;\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(0) + ") 0 -72px;\r\n  opacity: 0.4;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button:hover div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button:focus div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li.jsoneditor-selected div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand:hover div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand:focus div.jsoneditor-expand {\r\n  opacity: 1;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu div.jsoneditor-separator {\r\n  height: 0;\r\n  border-top: 1px solid #e5e5e5;\r\n  padding-top: 5px;\r\n  margin-top: 5px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove > div.jsoneditor-icon {\r\n  background-position: -24px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove:focus > div.jsoneditor-icon {\r\n  background-position: -24px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append > div.jsoneditor-icon {\r\n  background-position: 0 -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append:focus > div.jsoneditor-icon {\r\n  background-position: 0 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert > div.jsoneditor-icon {\r\n  background-position: 0 -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert:focus > div.jsoneditor-icon {\r\n  background-position: 0 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate > div.jsoneditor-icon {\r\n  background-position: -48px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate:focus > div.jsoneditor-icon {\r\n  background-position: -48px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc > div.jsoneditor-icon {\r\n  background-position: -168px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc:focus > div.jsoneditor-icon {\r\n  background-position: -168px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc > div.jsoneditor-icon {\r\n  background-position: -192px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc:focus > div.jsoneditor-icon {\r\n  background-position: -192px 0;\r\n}\r\n\r\n/* ContextMenu - sub menu */\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected:hover,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected:focus {\r\n  color: white;\r\n  background-color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li {\r\n  overflow: hidden;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li ul {\r\n  display: none;\r\n  position: relative;\r\n  left: -10px;\r\n  top: 0;\r\n  border: none;\r\n  box-shadow: inset 0 0 10px rgba(128, 128, 128, 0.5);\r\n  padding: 0 10px;\r\n  /* TODO: transition is not supported on IE8-9 */\r\n  -webkit-transition: all 0.3s ease-out;\r\n  -moz-transition: all 0.3s ease-out;\r\n  -o-transition: all 0.3s ease-out;\r\n  transition: all 0.3s ease-out;\r\n}\r\n\r\n\r\n\r\ndiv.jsoneditor-contextmenu ul li ul li button {\r\n  padding-left: 24px;\r\n  animation: all ease-in-out 1s;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li ul li button:hover,\r\ndiv.jsoneditor-contextmenu ul li ul li button:focus {\r\n  background-color: #f5f5f5;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string > div.jsoneditor-icon {\r\n  background-position: -144px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -144px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto > div.jsoneditor-icon {\r\n  background-position: -120px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -120px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object > div.jsoneditor-icon {\r\n  background-position: -72px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -72px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array > div.jsoneditor-icon {\r\n  background-position: -96px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -96px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-modes > div.jsoneditor-icon {\r\n  background-image: none;\r\n  width: 6px;\r\n}\r\ndiv.jsoneditor-menu {\r\n  width: 100%;\r\n  height: 35px;\r\n  padding: 2px;\r\n  margin: 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  color: white;\r\n  background-color: #3883fa;\r\n  border-bottom: 1px solid #3883fa;\r\n}\r\n\r\ndiv.jsoneditor-menu > button,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button {\r\n  width: 26px;\r\n  height: 26px;\r\n  margin: 2px;\r\n  padding: 0;\r\n  border-radius: 2px;\r\n  border: 1px solid transparent;\r\n  background: transparent url(" + __webpack_require__(0) + ");\r\n  color: white;\r\n  opacity: 0.8;\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  float: left;\r\n}\r\n\r\ndiv.jsoneditor-menu > button:hover,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:hover {\r\n  background-color: rgba(255,255,255,0.2);\r\n  border: 1px solid rgba(255,255,255,0.4);\r\n}\r\n\r\ndiv.jsoneditor-menu > button:focus,\r\ndiv.jsoneditor-menu > button:active,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:focus,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:active {\r\n  background-color: rgba(255,255,255,0.3);\r\n}\r\n\r\ndiv.jsoneditor-menu > button:disabled,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:disabled {\r\n  opacity: 0.5;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-collapse-all {\r\n  background-position: 0 -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-expand-all {\r\n  background-position: 0 -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-undo {\r\n  background-position: -24px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-undo:disabled {\r\n  background-position: -24px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-redo {\r\n  background-position: -48px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-redo:disabled {\r\n  background-position: -48px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-compact {\r\n  background-position: -72px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-format {\r\n  background-position: -72px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > div.jsoneditor-modes {\r\n  display: inline-block;\r\n  float: left;\r\n}\r\n\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button {\r\n  background-image: none;\r\n  width: auto;\r\n  padding-left: 6px;\r\n  padding-right: 6px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-separator,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button.jsoneditor-separator {\r\n  margin-left: 10px;\r\n}\r\n\r\ndiv.jsoneditor-menu a {\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  color: white;\r\n  opacity: 0.8;\r\n  vertical-align: middle;\r\n}\r\n\r\ndiv.jsoneditor-menu a:hover {\r\n  opacity: 1;\r\n}\r\n\r\ndiv.jsoneditor-menu a.jsoneditor-poweredBy {\r\n  font-size: 8pt;\r\n  position: absolute;\r\n  right: 0;\r\n  top: 0;\r\n  padding: 10px;\r\n}\r\ntable.jsoneditor-search input,\r\ntable.jsoneditor-search div.jsoneditor-results {\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  color: #1A1A1A;\r\n  background: transparent;\r\n  /* For Firefox */\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-results {\r\n  color: white;\r\n  padding-right: 5px;\r\n  line-height: 24px;\r\n}\r\n\r\ntable.jsoneditor-search {\r\n  position: absolute;\r\n  right: 4px;\r\n  top: 4px;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-frame {\r\n  border: 1px solid transparent;\r\n  background-color: white;\r\n  padding: 0 2px;\r\n  margin: 0;\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-frame table {\r\n  border-collapse: collapse;\r\n}\r\n\r\ntable.jsoneditor-search input {\r\n  width: 120px;\r\n  border: none;\r\n  outline: none;\r\n  margin: 1px;\r\n  line-height: 20px;\r\n}\r\n\r\ntable.jsoneditor-search button {\r\n  width: 16px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0;\r\n  border: none;\r\n  background: url(" + __webpack_require__(0) + ");\r\n  vertical-align: top;\r\n}\r\n\r\ntable.jsoneditor-search button:hover {\r\n  background-color: transparent;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-refresh {\r\n  width: 18px;\r\n  background-position: -99px -73px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-next {\r\n  cursor: pointer;\r\n  background-position: -124px -73px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-next:hover {\r\n  background-position: -124px -49px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-previous {\r\n  cursor: pointer;\r\n  background-position: -148px -73px;\r\n  margin-right: 2px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-previous:hover {\r\n  background-position: -148px -49px;\r\n}", ""]);
 
 // exports
 
 
 /***/ }),
-/* 66 */
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+var stylesInDom = {};
+
+var	memoize = function (fn) {
+	var memo;
+
+	return function () {
+		if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+		return memo;
+	};
+};
+
+var isOldIE = memoize(function () {
+	// Test for IE <= 9 as proposed by Browserhacks
+	// @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
+	// Tests for existence of standard globals is to allow style-loader
+	// to operate correctly into non-standard environments
+	// @see https://github.com/webpack-contrib/style-loader/issues/177
+	return window && document && document.all && !window.atob;
+});
+
+var getElement = (function (fn) {
+	var memo = {};
+
+	return function(selector) {
+		if (typeof memo[selector] === "undefined") {
+			memo[selector] = fn.call(this, selector);
+		}
+
+		return memo[selector]
+	};
+})(function (target) {
+	return document.querySelector(target)
+});
+
+var singleton = null;
+var	singletonCounter = 0;
+var	stylesInsertedAtTop = [];
+
+var	fixUrls = __webpack_require__(31);
+
+module.exports = function(list, options) {
+	if (typeof DEBUG !== "undefined" && DEBUG) {
+		if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+	}
+
+	options = options || {};
+
+	options.attrs = typeof options.attrs === "object" ? options.attrs : {};
+
+	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+	// tags it will allow on a page
+	if (!options.singleton) options.singleton = isOldIE();
+
+	// By default, add <style> tags to the <head> element
+	if (!options.insertInto) options.insertInto = "head";
+
+	// By default, add <style> tags to the bottom of the target
+	if (!options.insertAt) options.insertAt = "bottom";
+
+	var styles = listToStyles(list, options);
+
+	addStylesToDom(styles, options);
+
+	return function update (newList) {
+		var mayRemove = [];
+
+		for (var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+
+			domStyle.refs--;
+			mayRemove.push(domStyle);
+		}
+
+		if(newList) {
+			var newStyles = listToStyles(newList, options);
+			addStylesToDom(newStyles, options);
+		}
+
+		for (var i = 0; i < mayRemove.length; i++) {
+			var domStyle = mayRemove[i];
+
+			if(domStyle.refs === 0) {
+				for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
+
+				delete stylesInDom[domStyle.id];
+			}
+		}
+	};
+};
+
+function addStylesToDom (styles, options) {
+	for (var i = 0; i < styles.length; i++) {
+		var item = styles[i];
+		var domStyle = stylesInDom[item.id];
+
+		if(domStyle) {
+			domStyle.refs++;
+
+			for(var j = 0; j < domStyle.parts.length; j++) {
+				domStyle.parts[j](item.parts[j]);
+			}
+
+			for(; j < item.parts.length; j++) {
+				domStyle.parts.push(addStyle(item.parts[j], options));
+			}
+		} else {
+			var parts = [];
+
+			for(var j = 0; j < item.parts.length; j++) {
+				parts.push(addStyle(item.parts[j], options));
+			}
+
+			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+		}
+	}
+}
+
+function listToStyles (list, options) {
+	var styles = [];
+	var newStyles = {};
+
+	for (var i = 0; i < list.length; i++) {
+		var item = list[i];
+		var id = options.base ? item[0] + options.base : item[0];
+		var css = item[1];
+		var media = item[2];
+		var sourceMap = item[3];
+		var part = {css: css, media: media, sourceMap: sourceMap};
+
+		if(!newStyles[id]) styles.push(newStyles[id] = {id: id, parts: [part]});
+		else newStyles[id].parts.push(part);
+	}
+
+	return styles;
+}
+
+function insertStyleElement (options, style) {
+	var target = getElement(options.insertInto)
+
+	if (!target) {
+		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
+	}
+
+	var lastStyleElementInsertedAtTop = stylesInsertedAtTop[stylesInsertedAtTop.length - 1];
+
+	if (options.insertAt === "top") {
+		if (!lastStyleElementInsertedAtTop) {
+			target.insertBefore(style, target.firstChild);
+		} else if (lastStyleElementInsertedAtTop.nextSibling) {
+			target.insertBefore(style, lastStyleElementInsertedAtTop.nextSibling);
+		} else {
+			target.appendChild(style);
+		}
+		stylesInsertedAtTop.push(style);
+	} else if (options.insertAt === "bottom") {
+		target.appendChild(style);
+	} else {
+		throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+	}
+}
+
+function removeStyleElement (style) {
+	if (style.parentNode === null) return false;
+	style.parentNode.removeChild(style);
+
+	var idx = stylesInsertedAtTop.indexOf(style);
+	if(idx >= 0) {
+		stylesInsertedAtTop.splice(idx, 1);
+	}
+}
+
+function createStyleElement (options) {
+	var style = document.createElement("style");
+
+	options.attrs.type = "text/css";
+
+	addAttrs(style, options.attrs);
+	insertStyleElement(options, style);
+
+	return style;
+}
+
+function createLinkElement (options) {
+	var link = document.createElement("link");
+
+	options.attrs.type = "text/css";
+	options.attrs.rel = "stylesheet";
+
+	addAttrs(link, options.attrs);
+	insertStyleElement(options, link);
+
+	return link;
+}
+
+function addAttrs (el, attrs) {
+	Object.keys(attrs).forEach(function (key) {
+		el.setAttribute(key, attrs[key]);
+	});
+}
+
+function addStyle (obj, options) {
+	var style, update, remove, result;
+
+	// If a transform function was defined, run it on the css
+	if (options.transform && obj.css) {
+	    result = options.transform(obj.css);
+
+	    if (result) {
+	    	// If transform returns a value, use that instead of the original css.
+	    	// This allows running runtime transformations on the css.
+	    	obj.css = result;
+	    } else {
+	    	// If the transform function returns a falsy value, don't add this css.
+	    	// This allows conditional loading of css
+	    	return function() {
+	    		// noop
+	    	};
+	    }
+	}
+
+	if (options.singleton) {
+		var styleIndex = singletonCounter++;
+
+		style = singleton || (singleton = createStyleElement(options));
+
+		update = applyToSingletonTag.bind(null, style, styleIndex, false);
+		remove = applyToSingletonTag.bind(null, style, styleIndex, true);
+
+	} else if (
+		obj.sourceMap &&
+		typeof URL === "function" &&
+		typeof URL.createObjectURL === "function" &&
+		typeof URL.revokeObjectURL === "function" &&
+		typeof Blob === "function" &&
+		typeof btoa === "function"
+	) {
+		style = createLinkElement(options);
+		update = updateLink.bind(null, style, options);
+		remove = function () {
+			removeStyleElement(style);
+
+			if(style.href) URL.revokeObjectURL(style.href);
+		};
+	} else {
+		style = createStyleElement(options);
+		update = applyToTag.bind(null, style);
+		remove = function () {
+			removeStyleElement(style);
+		};
+	}
+
+	update(obj);
+
+	return function updateStyle (newObj) {
+		if (newObj) {
+			if (
+				newObj.css === obj.css &&
+				newObj.media === obj.media &&
+				newObj.sourceMap === obj.sourceMap
+			) {
+				return;
+			}
+
+			update(obj = newObj);
+		} else {
+			remove();
+		}
+	};
+}
+
+var replaceText = (function () {
+	var textStore = [];
+
+	return function (index, replacement) {
+		textStore[index] = replacement;
+
+		return textStore.filter(Boolean).join('\n');
+	};
+})();
+
+function applyToSingletonTag (style, index, remove, obj) {
+	var css = remove ? "" : obj.css;
+
+	if (style.styleSheet) {
+		style.styleSheet.cssText = replaceText(index, css);
+	} else {
+		var cssNode = document.createTextNode(css);
+		var childNodes = style.childNodes;
+
+		if (childNodes[index]) style.removeChild(childNodes[index]);
+
+		if (childNodes.length) {
+			style.insertBefore(cssNode, childNodes[index]);
+		} else {
+			style.appendChild(cssNode);
+		}
+	}
+}
+
+function applyToTag (style, obj) {
+	var css = obj.css;
+	var media = obj.media;
+
+	if(media) {
+		style.setAttribute("media", media)
+	}
+
+	if(style.styleSheet) {
+		style.styleSheet.cssText = css;
+	} else {
+		while(style.firstChild) {
+			style.removeChild(style.firstChild);
+		}
+
+		style.appendChild(document.createTextNode(css));
+	}
+}
+
+function updateLink (link, options, obj) {
+	var css = obj.css;
+	var sourceMap = obj.sourceMap;
+
+	/*
+		If convertToAbsoluteUrls isn't defined, but sourcemaps are enabled
+		and there is no publicPath defined then lets turn convertToAbsoluteUrls
+		on by default.  Otherwise default to the convertToAbsoluteUrls option
+		directly
+	*/
+	var autoFixUrls = options.convertToAbsoluteUrls === undefined && sourceMap;
+
+	if (options.convertToAbsoluteUrls || autoFixUrls) {
+		css = fixUrls(css);
+	}
+
+	if (sourceMap) {
+		// http://stackoverflow.com/a/26603875
+		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+	}
+
+	var blob = new Blob([css], { type: "text/css" });
+
+	var oldSrc = link.href;
+
+	link.href = URL.createObjectURL(blob);
+
+	if(oldSrc) URL.revokeObjectURL(oldSrc);
+}
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports) {
+
+
+/**
+ * When source maps are enabled, `style-loader` uses a link element with a data-uri to
+ * embed the css on the page. This breaks all relative urls because now they are relative to a
+ * bundle instead of the current page.
+ *
+ * One solution is to only use full urls, but that may be impossible.
+ *
+ * Instead, this function "fixes" the relative urls to be absolute according to the current page location.
+ *
+ * A rudimentary test suite is located at `test/fixUrls.js` and can be run via the `npm test` command.
+ *
+ */
+
+module.exports = function (css) {
+  // get current location
+  var location = typeof window !== "undefined" && window.location;
+
+  if (!location) {
+    throw new Error("fixUrls requires window.location");
+  }
+
+	// blank or null?
+	if (!css || typeof css !== "string") {
+	  return css;
+  }
+
+  var baseUrl = location.protocol + "//" + location.host;
+  var currentDir = baseUrl + location.pathname.replace(/\/[^\/]*$/, "/");
+
+	// convert each url(...)
+	/*
+	This regular expression is just a way to recursively match brackets within
+	a string.
+
+	 /url\s*\(  = Match on the word "url" with any whitespace after it and then a parens
+	   (  = Start a capturing group
+	     (?:  = Start a non-capturing group
+	         [^)(]  = Match anything that isn't a parentheses
+	         |  = OR
+	         \(  = Match a start parentheses
+	             (?:  = Start another non-capturing groups
+	                 [^)(]+  = Match anything that isn't a parentheses
+	                 |  = OR
+	                 \(  = Match a start parentheses
+	                     [^)(]*  = Match anything that isn't a parentheses
+	                 \)  = Match a end parentheses
+	             )  = End Group
+              *\) = Match anything and then a close parens
+          )  = Close non-capturing group
+          *  = Match anything
+       )  = Close capturing group
+	 \)  = Match a close parens
+
+	 /gi  = Get all matches, not the first.  Be case insensitive.
+	 */
+	var fixedCss = css.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi, function(fullMatch, origUrl) {
+		// strip quotes (if they exist)
+		var unquotedOrigUrl = origUrl
+			.trim()
+			.replace(/^"(.*)"$/, function(o, $1){ return $1; })
+			.replace(/^'(.*)'$/, function(o, $1){ return $1; });
+
+		// already a full url? no change
+		if (/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/)/i.test(unquotedOrigUrl)) {
+		  return fullMatch;
+		}
+
+		// convert the url to a full url
+		var newUrl;
+
+		if (unquotedOrigUrl.indexOf("//") === 0) {
+		  	//TODO: should we add protocol?
+			newUrl = unquotedOrigUrl;
+		} else if (unquotedOrigUrl.indexOf("/") === 0) {
+			// path should be relative to the base url
+			newUrl = baseUrl + unquotedOrigUrl; // already starts with '/'
+		} else {
+			// path should be relative to current directory
+			newUrl = currentDir + unquotedOrigUrl.replace(/^\.\//, ""); // Strip leading './'
+		}
+
+		// send back the fixed url(...)
+		return "url(" + JSON.stringify(newUrl) + ")";
+	});
+
+	// send back the fixed css
+	return fixedCss;
+};
+
+
+/***/ }),
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -69986,7 +69702,7 @@ return /******/ (function(modules) { // webpackBootstrap
 ;
 
 /***/ }),
-/* 67 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -70024,6 +69740,264 @@ if (false) {
     require("vue-hot-reload-api")      .rerender("data-v-566ccedd", module.exports)
   }
 }
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c("h1", [_vm._v(_vm._s(this.$route.params.name))]),
+      _vm._v(" "),
+      _c("vue-json-editor", {
+        attrs: { showBtns: false },
+        model: {
+          value: _vm.list,
+          callback: function($$v) {
+            _vm.list = $$v
+          },
+          expression: "list"
+        }
+      })
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-52583c30", module.exports)
+  }
+}
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(36)
+/* template */
+var __vue_template__ = __webpack_require__(40)
+/* template functional */
+  var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/js/Main.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-31ef5f29", Component.options)
+  } else {
+    hotAPI.reload("data-v-31ef5f29", Component.options)
+' + '  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 36 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_navbar__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_navbar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_navbar__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    components: {
+        navBar: __WEBPACK_IMPORTED_MODULE_0__components_navbar___default.a
+    }
+});
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(38)
+/* template */
+var __vue_template__ = __webpack_require__(39)
+/* template functional */
+  var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/js/components/navbar.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-37b29f09", Component.options)
+  } else {
+    hotAPI.reload("data-v-37b29f09", Component.options)
+' + '  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({});
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("nav", { staticClass: "navbar navbar-inverse navbar-fixed-top" }, [
+    _c("ul", { staticClass: "nav navbar-nav" }, [
+      _c(
+        "li",
+        [
+          _c("router-link", { attrs: { tag: "a", to: "/home" } }, [
+            _vm._v("Home")
+          ])
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "li",
+        [
+          _c("router-link", { attrs: { tag: "a", to: "/lists" } }, [
+            _vm._v("Lists")
+          ])
+        ],
+        1
+      )
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-37b29f09", module.exports)
+  }
+}
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c("nav-bar"),
+      _vm._v(" "),
+      _c("div", { staticClass: "container-fluid" }, [_c("router-view")], 1)
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-31ef5f29", module.exports)
+  }
+}
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);
