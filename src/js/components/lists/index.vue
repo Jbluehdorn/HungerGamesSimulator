@@ -3,7 +3,12 @@
         <div class="col-xs-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Lists</h3>
+                    <h3 class="panel-title">
+                        Lists
+                        <router-link tag="button" class="btn btn-xs btn-primary pull-right" to="lists/create">
+                            <i class="fa fa-plus"></i>
+                        </router-link>
+                    </h3>
                 </div>
                 <table class="table-responsive table table-striped table-hover">
                     <tbody>

@@ -19,6 +19,9 @@ const router = new VueRouter({
         path: '/lists',
         component: require('./components/lists/index'),
         children: [{
+            path: 'create',
+            component: require('./components/lists/create')
+        }, {
             path: ':name',
             component: require('./components/lists/show')
         }]
