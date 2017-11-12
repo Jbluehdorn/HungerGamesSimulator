@@ -16,7 +16,8 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 800, 
     height: 600, 
-    resizable: true
+    resizable: true,
+    publicPath: './'
   })
 
   // and load the index.html of the app.

@@ -220,6 +220,12 @@ var listsFolder = 'storage/lists/';
     },
     loadFile: function loadFile(fileName) {
         return fs.readFileSync(listsFolder + fileName, 'utf8');
+    },
+    writeFile: function writeFile(fileName, json) {
+        fs.writeFile(listsFolder + fileName, JSON.stringify(json), 'utf8', function (err) {
+            if (err) throw err;
+            console.log('The file has been saved!');
+        });
     }
 });
 
@@ -32394,6 +32400,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   methods: {
     refresh: function refresh() {
       this.list = JSON.parse(__WEBPACK_IMPORTED_MODULE_0__store_js__["a" /* default */].loadFile(this.$route.params.name));
+    },
+    save: function save(json) {
+      __WEBPACK_IMPORTED_MODULE_0__store_js__["a" /* default */].writeFile(this.$route.params.name, json);
     }
   },
   watch: {
@@ -69756,6 +69765,7 @@ var render = function() {
       _vm._v(" "),
       _c("vue-json-editor", {
         attrs: { showBtns: false },
+        on: { "json-change": _vm.save },
         model: {
           value: _vm.list,
           callback: function($$v) {

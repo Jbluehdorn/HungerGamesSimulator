@@ -1,10 +1,1 @@
-[
-    {
-        "id": 1,
-        "name": "Jim McElwain"
-    },
-    {
-        "id": 2,
-        "name": "Charlie Strong"
-    }
-]
+[{"id":1,"name":"Jim McElwain"},{"id":2,"name":"Charlie Strong"},{"id":3,"name":"Nick Saban"}]

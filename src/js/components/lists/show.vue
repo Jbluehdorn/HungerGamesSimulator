@@ -1,7 +1,7 @@
 <template>
   <div>
       <h1>{{this.$route.params.name}}</h1>
-      <vue-json-editor v-model="list" :showBtns="false"></vue-json-editor>
+      <vue-json-editor v-model="list" :showBtns="false" @json-change="save"></vue-json-editor>
   </div>
 </template>
 
@@ -25,6 +25,9 @@ export default {
   methods: {
     refresh() {
       this.list = JSON.parse(store.loadFile(this.$route.params.name));
+    },
+    save(json) {
+      store.writeFile(this.$route.params.name, json);
     }
   },
   watch: {
