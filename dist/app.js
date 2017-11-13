@@ -14062,7 +14062,7 @@ if (inBrowser && window.Vue) {
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = null
+var __vue_script__ = __webpack_require__(50)
 /* template */
 var __vue_template__ = __webpack_require__(14)
 /* template functional */
@@ -14111,16 +14111,14 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c(
+    "div",
+    _vm._l(_vm.players, function(player) {
+      return _c("player", { key: player.name, attrs: { player: player } })
+    })
+  )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", [_c("h1", [_vm._v("Hello there!")])])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
@@ -69261,6 +69259,216 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 44 */,
+/* 45 */,
+/* 46 */,
+/* 47 */,
+/* 48 */,
+/* 49 */,
+/* 50 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_player__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_player___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__game_player__);
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  components: { player: __WEBPACK_IMPORTED_MODULE_0__game_player___default.a },
+  data: function data() {
+    return {
+      players: [{ name: "Mike Leach",
+        health: 10,
+        attackPower: 5,
+        agility: 5,
+        state: "None",
+        primaryWeapon: "Sword",
+        weapon: "None",
+        action: "None",
+        target: "None" }]
+    };
+  }
+});
+
+/***/ }),
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(52)
+/* template */
+var __vue_template__ = __webpack_require__(53)
+/* template functional */
+  var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/js/components/game/player.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-ae7ea916", Component.options)
+  } else {
+    hotAPI.reload("data-v-ae7ea916", Component.options)
+' + '  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 52 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['player'],
+  data: function data() {
+    return {
+      name: "None",
+      health: 10,
+      attackPower: 5,
+      agility: 5,
+      state: "None",
+      weapon: "None",
+      action: "None",
+      target: "None",
+      damage: 0,
+      output: ""
+    };
+  },
+
+  methods: {
+    getAction: function getAction() {
+      var AVAILABLE_WEAPONS = ["Sword", "Battleaxe", "Bow"];
+      //import AVAILABLE_WEAPONS from game state in above line
+      if (this.player.weapon == "None" && AVAILABLE_WEAPONS.length > 0) {
+        console.log("not this one");
+        this.player.weapon = AVAILABLE_WEAPONS.pop();
+      }
+      var ACTIONS = ["Attacked", "Ran", "Hid"];
+      this.player.action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
+    },
+    getTarget: function getTarget() {
+      if (this.player.action == "Attacked") {
+        var AVAILABLE_TARGETS = ["Lane Kiffin", "Kirby Smart"];
+        //import AVAILABLE_TARGETS from game state in above line
+      } else if (this.player.action == "Hid") {
+        var AVAILABLE_TARGETS = ["Bush", "Tree"];
+      } else {
+        var AVAILABLE_TARGETS = ["None"];
+      }
+      this.player.target = AVAILABLE_TARGETS[Math.floor(Math.random() * AVAILABLE_TARGETS.length)];
+    },
+    getDamage: function getDamage() {
+      //Adjust to account for weapon boost, need to make weapon an obj
+      this.player.damage = Math.floor(Math.random() * this.player.attackPower) + 1;
+    },
+    generateOutput: function generateOutput() {
+      this.getAction();
+      this.getTarget();
+      if (this.player.action == "Attacked") {
+        this.getDamage();
+      } else {
+        this.player.damage = 0;
+      }
+    }
+  }
+});
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("h1", [_vm._v("I'm " + _vm._s(_vm.player.name) + "!")]),
+    _vm._v(" "),
+    _vm.player.weapon != "None"
+      ? _c("h3", [_vm._v("My weapon is a " + _vm._s(_vm.player.weapon))])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.player.action != "None"
+      ? _c("h3", [_vm._v("My action is " + _vm._s(_vm.player.action))])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.player.target != "None"
+      ? _c("h3", [_vm._v("My target us " + _vm._s(_vm.player.target))])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.player.damage > 0
+      ? _c("h3", [
+          _vm._v("My damage calculation is " + _vm._s(_vm.player.damage))
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _c("button", { on: { click: _vm.generateOutput } }, [
+      _vm._v("Generate Output")
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-ae7ea916", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);
