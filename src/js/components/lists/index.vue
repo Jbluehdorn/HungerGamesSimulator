@@ -5,7 +5,7 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">
                         Lists
-                        <router-link tag="button" class="btn btn-xs btn-primary pull-right" to="lists/create">
+                        <router-link tag="button" class="btn btn-xs btn-primary pull-right" to="/lists/create">
                             <i class="fa fa-plus"></i>
                         </router-link>
                     </h3>

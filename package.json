@@ -11,8 +11,7 @@
     "production": "NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
   "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-  ],
+  "keywords": [],
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
