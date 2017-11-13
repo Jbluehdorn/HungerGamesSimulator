@@ -67,12 +67,6 @@
 /* 0 */
 /***/ (function(module, exports) {
 
-module.exports = "/fonts/vendor/vue-json-editor/img/jsoneditor-icons.svg?256e3abce3a61ba656dbb8f4967e3933";
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
 /* globals __VUE_SSR_CONTEXT__ */
 
 // IMPORTANT: Do NOT use ES2015 features in this file.
@@ -177,6 +171,12 @@ module.exports = function normalizeComponent (
   }
 }
 
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+module.exports = "/fonts/vendor/vue-json-editor/img/jsoneditor-icons.svg?256e3abce3a61ba656dbb8f4967e3933";
 
 /***/ }),
 /* 2 */
@@ -316,7 +316,7 @@ function toComment(sourceMap) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(6);
-module.exports = __webpack_require__(41);
+module.exports = __webpack_require__(48);
 
 
 /***/ }),
@@ -348,13 +348,13 @@ var router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
         component: __webpack_require__(13)
     }, {
         path: '/lists',
-        component: __webpack_require__(15),
+        component: __webpack_require__(19),
         children: [{
             path: 'create',
-            component: __webpack_require__(48)
+            component: __webpack_require__(24)
         }, {
             path: ':name',
-            component: __webpack_require__(20)
+            component: __webpack_require__(27)
         }]
     }, {
         path: '**',
@@ -364,7 +364,7 @@ var router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
 
 var vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
     render: function render(h) {
-        return h(__webpack_require__(35));
+        return h(__webpack_require__(42));
     },
     router: router
 }).$mount('#main');
@@ -375,7 +375,7 @@ var vm = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global, setImmediate) {/*!
- * Vue.js v2.5.2
+ * Vue.js v2.5.3
  * (c) 2014-2017 Evan You
  * Released under the MIT License.
  */
@@ -1136,6 +1136,7 @@ function createTextVNode (val) {
 // multiple renders, cloning them avoids errors when DOM manipulations rely
 // on their elm reference.
 function cloneVNode (vnode, deep) {
+  var componentOptions = vnode.componentOptions;
   var cloned = new VNode(
     vnode.tag,
     vnode.data,
@@ -1143,7 +1144,7 @@ function cloneVNode (vnode, deep) {
     vnode.text,
     vnode.elm,
     vnode.context,
-    vnode.componentOptions,
+    componentOptions,
     vnode.asyncFactory
   );
   cloned.ns = vnode.ns;
@@ -1151,8 +1152,13 @@ function cloneVNode (vnode, deep) {
   cloned.key = vnode.key;
   cloned.isComment = vnode.isComment;
   cloned.isCloned = true;
-  if (deep && vnode.children) {
-    cloned.children = cloneVNodes(vnode.children);
+  if (deep) {
+    if (vnode.children) {
+      cloned.children = cloneVNodes(vnode.children, true);
+    }
+    if (componentOptions && componentOptions.children) {
+      componentOptions.children = cloneVNodes(componentOptions.children, true);
+    }
   }
   return cloned
 }
@@ -1385,7 +1391,7 @@ function set (target, key, val) {
     target.splice(key, 1, val);
     return val
   }
-  if (hasOwn(target, key)) {
+  if (key in target && !(key in Object.prototype)) {
     target[key] = val;
     return val
   }
@@ -1517,7 +1523,7 @@ function mergeDataOrFn (
         typeof parentVal === 'function' ? parentVal.call(this) : parentVal
       )
     }
-  } else if (parentVal || childVal) {
+  } else {
     return function mergedInstanceDataFn () {
       // instance merge
       var instanceData = typeof childVal === 'function'
@@ -1551,7 +1557,7 @@ strats.data = function (
 
       return parentVal
     }
-    return mergeDataOrFn.call(this, parentVal, childVal)
+    return mergeDataOrFn(parentVal, childVal)
   }
 
   return mergeDataOrFn(parentVal, childVal, vm)
@@ -2357,6 +2363,9 @@ function updateListeners (
 /*  */
 
 function mergeVNodeHook (def, hookKey, hook) {
+  if (def instanceof VNode) {
+    def = def.data.hook || (def.data.hook = {});
+  }
   var invoker;
   var oldHook = def[hookKey];
 
@@ -2724,6 +2733,7 @@ function updateComponentListeners (
 ) {
   target = vm;
   updateListeners(listeners, oldListeners || {}, add, remove$1, vm);
+  target = undefined;
 }
 
 function eventsMixin (Vue) {
@@ -2779,7 +2789,7 @@ function eventsMixin (Vue) {
     if (!cbs) {
       return vm
     }
-    if (arguments.length === 1) {
+    if (!fn) {
       vm._events[event] = null;
       return vm
     }
@@ -2841,7 +2851,6 @@ function resolveSlots (
   if (!children) {
     return slots
   }
-  var defaultSlot = [];
   for (var i = 0, l = children.length; i < l; i++) {
     var child = children[i];
     var data = child.data;
@@ -2862,12 +2871,14 @@ function resolveSlots (
         slot.push(child);
       }
     } else {
-      defaultSlot.push(child);
+      (slots.default || (slots.default = [])).push(child);
     }
   }
-  // ignore whitespace
-  if (!defaultSlot.every(isWhitespace)) {
-    slots.default = defaultSlot;
+  // ignore slots that contains only whitespace
+  for (var name$1 in slots) {
+    if (slots[name$1].every(isWhitespace)) {
+      delete slots[name$1];
+    }
   }
   return slots
 }
@@ -4031,6 +4042,7 @@ function renderSlot (
   bindObject
 ) {
   var scopedSlotFn = this.$scopedSlots[name];
+  var nodes;
   if (scopedSlotFn) { // scoped slot
     props = props || {};
     if (bindObject) {
@@ -4042,19 +4054,28 @@ function renderSlot (
       }
       props = extend(extend({}, bindObject), props);
     }
-    return scopedSlotFn(props) || fallback
+    nodes = scopedSlotFn(props) || fallback;
   } else {
     var slotNodes = this.$slots[name];
     // warn duplicate slot usage
-    if (slotNodes && "development" !== 'production') {
-      slotNodes._rendered && warn(
-        "Duplicate presence of slot \"" + name + "\" found in the same render tree " +
-        "- this will likely cause render errors.",
-        this
-      );
+    if (slotNodes) {
+      if ("development" !== 'production' && slotNodes._rendered) {
+        warn(
+          "Duplicate presence of slot \"" + name + "\" found in the same render tree " +
+          "- this will likely cause render errors.",
+          this
+        );
+      }
       slotNodes._rendered = true;
     }
-    return slotNodes || fallback
+    nodes = slotNodes || fallback;
+  }
+
+  var target = props && props.slot;
+  if (target) {
+    return this.$createElement('template', { slot: target }, nodes)
+  } else {
+    return nodes
   }
 }
 
@@ -4157,8 +4178,8 @@ function renderStatic (
 ) {
   // static trees can be rendered once and cached on the contructor options
   // so every instance shares the same cached trees
-  var renderFns = this.$options.staticRenderFns;
-  var cached = renderFns.cached || (renderFns.cached = []);
+  var options = this.$options;
+  var cached = options.cached || (options.cached = []);
   var tree = cached[index];
   // if has already-rendered static tree and not inside v-for,
   // we can reuse the same tree by doing a shallow clone.
@@ -4168,7 +4189,7 @@ function renderStatic (
       : cloneVNode(tree)
   }
   // otherwise, render a fresh tree.
-  tree = cached[index] = renderFns[index].call(this._renderProxy, null, this);
+  tree = cached[index] = options.staticRenderFns[index].call(this._renderProxy, null, this);
   markStatic(tree, ("__static__" + index), false);
   return tree
 }
@@ -5209,8 +5230,8 @@ var KeepAlive = {
       // check pattern
       var name = getComponentName(componentOptions);
       if (name && (
-        (this.include && !matches(this.include, name)) ||
-        (this.exclude && matches(this.exclude, name))
+        (this.exclude && matches(this.exclude, name)) ||
+        (this.include && !matches(this.include, name))
       )) {
         return vnode
       }
@@ -5306,7 +5327,7 @@ Object.defineProperty(Vue$3.prototype, '$ssrContext', {
   }
 });
 
-Vue$3.version = '2.5.2';
+Vue$3.version = '2.5.3';
 
 /*  */
 
@@ -6287,9 +6308,12 @@ function createPatchFunction (backend) {
           // create an empty node and replace it
           oldVnode = emptyNodeAt(oldVnode);
         }
+
         // replacing existing element
         var oldElm = oldVnode.elm;
         var parentElm$1 = nodeOps.parentNode(oldElm);
+
+        // create new node
         createElm(
           vnode,
           insertedVnodeQueue,
@@ -6300,9 +6324,8 @@ function createPatchFunction (backend) {
           nodeOps.nextSibling(oldElm)
         );
 
+        // update parent placeholder node element, recursively
         if (isDef(vnode.parent)) {
-          // component root element replaced.
-          // update parent placeholder node element, recursively
           var ancestor = vnode.parent;
           var patchable = isPatchable(vnode);
           while (ancestor) {
@@ -6331,6 +6354,7 @@ function createPatchFunction (backend) {
           }
         }
 
+        // destroy old node
         if (isDef(parentElm$1)) {
           removeVnodes(parentElm$1, [oldVnode], 0, 0);
         } else if (isDef(oldVnode.tag)) {
@@ -6396,14 +6420,14 @@ function _update (oldVnode, vnode) {
       }
     };
     if (isCreate) {
-      mergeVNodeHook(vnode.data.hook || (vnode.data.hook = {}), 'insert', callInsert);
+      mergeVNodeHook(vnode, 'insert', callInsert);
     } else {
       callInsert();
     }
   }
 
   if (dirsWithPostpatch.length) {
-    mergeVNodeHook(vnode.data.hook || (vnode.data.hook = {}), 'postpatch', function () {
+    mergeVNodeHook(vnode, 'postpatch', function () {
       for (var i = 0; i < dirsWithPostpatch.length; i++) {
         callHook$1(dirsWithPostpatch[i], 'componentUpdated', vnode, oldVnode);
       }
@@ -7188,6 +7212,7 @@ function updateDOMListeners (oldVnode, vnode) {
   target$1 = vnode.elm;
   normalizeEvents(on);
   updateListeners(on, oldOn, add$1, remove$2, vnode.context);
+  target$1 = undefined;
 }
 
 var events = {
@@ -7793,7 +7818,7 @@ function enter (vnode, toggleDisplay) {
 
   if (!vnode.data.show) {
     // remove pending leave element on enter by injecting an insert hook
-    mergeVNodeHook(vnode.data.hook || (vnode.data.hook = {}), 'insert', function () {
+    mergeVNodeHook(vnode, 'insert', function () {
       var parent = el.parentNode;
       var pendingNode = parent && parent._pending && parent._pending[vnode.key];
       if (pendingNode &&
@@ -8032,10 +8057,17 @@ if (isIE9) {
   });
 }
 
-var model$1 = {
-  inserted: function inserted (el, binding, vnode) {
+var directive = {
+  inserted: function inserted (el, binding, vnode, oldVnode) {
     if (vnode.tag === 'select') {
-      setSelected(el, binding, vnode.context);
+      // #6903
+      if (oldVnode.elm && !oldVnode.elm._vOptions) {
+        mergeVNodeHook(vnode, 'postpatch', function () {
+          directive.componentUpdated(el, binding, vnode);
+        });
+      } else {
+        setSelected(el, binding, vnode.context);
+      }
       el._vOptions = [].map.call(el.options, getValue);
     } else if (vnode.tag === 'textarea' || isTextInputType(el.type)) {
       el._vModifiers = binding.modifiers;
@@ -8056,6 +8088,7 @@ var model$1 = {
       }
     }
   },
+
   componentUpdated: function componentUpdated (el, binding, vnode) {
     if (vnode.tag === 'select') {
       setSelected(el, binding, vnode.context);
@@ -8214,7 +8247,7 @@ var show = {
 };
 
 var platformDirectives = {
-  model: model$1,
+  model: directive,
   show: show
 };
 
@@ -8631,19 +8664,6 @@ Vue$3.nextTick(function () {
 
 /*  */
 
-// check whether current browser encodes a char inside attribute values
-function shouldDecode (content, encoded) {
-  var div = document.createElement('div');
-  div.innerHTML = "<div a=\"" + content + "\"/>";
-  return div.innerHTML.indexOf(encoded) > 0
-}
-
-// #3663
-// IE encodes newlines inside attribute values while other browsers don't
-var shouldDecodeNewlines = inBrowser ? shouldDecode('\n', '&#10;') : false;
-
-/*  */
-
 var defaultTagRE = /\{\{((?:.|\n)+?)\}\}/g;
 var regexEscapeRE = /[-.*+?^${}()|[\]\/\\]/g;
 
@@ -8840,10 +8860,11 @@ var decodingMap = {
   '&gt;': '>',
   '&quot;': '"',
   '&amp;': '&',
-  '&#10;': '\n'
+  '&#10;': '\n',
+  '&#9;': '\t'
 };
 var encodedAttr = /&(?:lt|gt|quot|amp);/g;
-var encodedAttrWithNewLines = /&(?:lt|gt|quot|amp|#10);/g;
+var encodedAttrWithNewLines = /&(?:lt|gt|quot|amp|#10|#9);/g;
 
 // #5992
 var isIgnoreNewlineTag = makeMap('pre,textarea', true);
@@ -9034,12 +9055,12 @@ function parseHTML (html, options) {
         if (args[5] === '') { delete args[5]; }
       }
       var value = args[3] || args[4] || args[5] || '';
+      var shouldDecodeNewlines = tagName === 'a' && args[1] === 'href'
+        ? options.shouldDecodeNewlinesForHref
+        : options.shouldDecodeNewlines;
       attrs[i] = {
         name: args[1],
-        value: decodeAttr(
-          value,
-          options.shouldDecodeNewlines
-        )
+        value: decodeAttr(value, shouldDecodeNewlines)
       };
     }
 
@@ -9198,6 +9219,7 @@ function parse (
     isUnaryTag: options.isUnaryTag,
     canBeLeftOpenTag: options.canBeLeftOpenTag,
     shouldDecodeNewlines: options.shouldDecodeNewlines,
+    shouldDecodeNewlinesForHref: options.shouldDecodeNewlinesForHref,
     shouldKeepComment: options.comments,
     start: function start (tag, attrs, unary) {
       // check namespace.
@@ -9556,7 +9578,7 @@ function processSlot (el) {
       el.slotTarget = slotTarget === '""' ? '"default"' : slotTarget;
       // preserve slot as an attribute for native shadow DOM compat
       // only for non-scoped slots.
-      if (!el.slotScope) {
+      if (el.tag !== 'template' && !el.slotScope) {
         addAttr(el, 'slot', slotTarget);
       }
     }
@@ -9645,6 +9667,13 @@ function processAttrs (el) {
         }
       }
       addAttr(el, name, JSON.stringify(value));
+      // #6887 firefox doesn't update muted state if set via attribute
+      // even immediately after element creation
+      if (!el.component &&
+          name === 'muted' &&
+          platformMustUseProp(el.tag, el.attrsMap.type, name)) {
+        addProp(el, name, 'true');
+      }
     }
   }
 }
@@ -9749,6 +9778,8 @@ function preTransformNode (el, options) {
       var typeBinding = getBindingAttr(el, 'type');
       var ifCondition = getAndRemoveAttr(el, 'v-if', true);
       var ifConditionExtra = ifCondition ? ("&&(" + ifCondition + ")") : "";
+      var hasElse = getAndRemoveAttr(el, 'v-else', true) != null;
+      var elseIfCondition = getAndRemoveAttr(el, 'v-else-if', true);
       // 1. checkbox
       var branch0 = cloneASTElement(el);
       // process for on the main node
@@ -9779,6 +9810,13 @@ function preTransformNode (el, options) {
         exp: ifCondition,
         block: branch2
       });
+
+      if (hasElse) {
+        branch0.else = true;
+      } else if (elseIfCondition) {
+        branch0.elseif = elseIfCondition;
+      }
+
       return branch0
     }
   }
@@ -10845,6 +10883,21 @@ var compileToFunctions = ref$1.compileToFunctions;
 
 /*  */
 
+// check whether current browser encodes a char inside attribute values
+var div;
+function getShouldDecode (href) {
+  div = div || document.createElement('div');
+  div.innerHTML = href ? "<a href=\"\n\"/>" : "<div a=\"\n\"/>";
+  return div.innerHTML.indexOf('&#10;') > 0
+}
+
+// #3663: IE encodes newlines inside attribute values while other browsers don't
+var shouldDecodeNewlines = inBrowser ? getShouldDecode(false) : false;
+// #6828: chrome encodes content in a[href]
+var shouldDecodeNewlinesForHref = inBrowser ? getShouldDecode(true) : false;
+
+/*  */
+
 var idToTemplate = cached(function (id) {
   var el = query(id);
   return el && el.innerHTML
@@ -10900,6 +10953,7 @@ Vue$3.prototype.$mount = function (
 
       var ref = compileToFunctions(template, {
         shouldDecodeNewlines: shouldDecodeNewlines,
+        shouldDecodeNewlinesForHref: shouldDecodeNewlinesForHref,
         delimiters: options.delimiters,
         comments: options.comments
       }, this);
@@ -14023,7 +14077,7 @@ if (inBrowser && window.Vue) {
 /* unused harmony export mapActions */
 /* unused harmony export createNamespacedHelpers */
 /**
- * vuex v3.0.0
+ * vuex v3.0.1
  * (c) 2017 Evan You
  * @license MIT
  */
@@ -14943,7 +14997,7 @@ function getModuleByNamespace (store, helper, namespace) {
 var index_esm = {
   Store: Store,
   install: install,
-  version: '3.0.0',
+  version: '3.0.1',
   mapState: mapState,
   mapMutations: mapMutations,
   mapGetters: mapGetters,
@@ -14960,13 +15014,13 @@ var index_esm = {
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(1)
+var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = null
+var __vue_script__ = __webpack_require__(14)
 /* template */
-var __vue_template__ = __webpack_require__(14)
+var __vue_template__ = __webpack_require__(18)
 /* template functional */
-  var __vue_template_functional__ = false
+var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -14991,9 +15045,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-351ab9e9", Component.options)
+    hotAPI.createRecord("data-v-490e9ad6", Component.options)
   } else {
-    hotAPI.reload("data-v-351ab9e9", Component.options)
+    hotAPI.reload("data-v-490e9ad6", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -15005,43 +15059,245 @@ module.exports = Component.exports
 
 /***/ }),
 /* 14 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", [_c("h1", [_vm._v("Hello there!")])])
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_player__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_player___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__game_player__);
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  components: { player: __WEBPACK_IMPORTED_MODULE_0__game_player___default.a },
+  data: function data() {
+    return {
+      players: [{ name: "Mike Leach",
+        health: 10,
+        attackPower: 5,
+        agility: 5,
+        state: "None",
+        primaryWeapon: "Sword",
+        weapon: "None",
+        action: "None",
+        target: "None" }]
+    };
   }
-]
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-351ab9e9", module.exports)
-  }
-}
+});
 
 /***/ }),
 /* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(1)
+var normalizeComponent = __webpack_require__(0)
 /* script */
 var __vue_script__ = __webpack_require__(16)
 /* template */
-var __vue_template__ = __webpack_require__(19)
+var __vue_template__ = __webpack_require__(17)
 /* template functional */
-  var __vue_template_functional__ = false
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/js/components/game/player.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-277166a2", Component.options)
+  } else {
+    hotAPI.reload("data-v-277166a2", Component.options)
+' + '  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['player'],
+  data: function data() {
+    return {
+      name: "None",
+      health: 10,
+      attackPower: 5,
+      agility: 5,
+      state: "None",
+      weapon: "None",
+      action: "None",
+      target: "None",
+      damage: 0,
+      output: ""
+    };
+  },
+
+  methods: {
+    getAction: function getAction() {
+      var AVAILABLE_WEAPONS = ["Sword", "Battleaxe", "Bow"];
+      //import AVAILABLE_WEAPONS from game state in above line
+      if (this.player.weapon == "None" && AVAILABLE_WEAPONS.length > 0) {
+        console.log("not this one");
+        this.player.weapon = AVAILABLE_WEAPONS.pop();
+      }
+      var ACTIONS = ["Attacked", "Ran", "Hid"];
+      this.player.action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
+    },
+    getTarget: function getTarget() {
+      if (this.player.action == "Attacked") {
+        var AVAILABLE_TARGETS = ["Lane Kiffin", "Kirby Smart"];
+        //import AVAILABLE_TARGETS from game state in above line
+      } else if (this.player.action == "Hid") {
+        var AVAILABLE_TARGETS = ["Bush", "Tree"];
+      } else {
+        var AVAILABLE_TARGETS = ["None"];
+      }
+      this.player.target = AVAILABLE_TARGETS[Math.floor(Math.random() * AVAILABLE_TARGETS.length)];
+    },
+    getDamage: function getDamage() {
+      //Adjust to account for weapon boost, need to make weapon an obj
+      this.player.damage = Math.floor(Math.random() * this.player.attackPower) + 1;
+    },
+    generateOutput: function generateOutput() {
+      this.getAction();
+      this.getTarget();
+      if (this.player.action == "Attacked") {
+        this.getDamage();
+      } else {
+        this.player.damage = 0;
+      }
+    }
+  }
+});
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("h1", [_vm._v("I'm " + _vm._s(_vm.player.name) + "!")]),
+    _vm._v(" "),
+    _vm.player.weapon != "None"
+      ? _c("h3", [_vm._v("My weapon is a " + _vm._s(_vm.player.weapon))])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.player.action != "None"
+      ? _c("h3", [_vm._v("My action is " + _vm._s(_vm.player.action))])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.player.target != "None"
+      ? _c("h3", [_vm._v("My target us " + _vm._s(_vm.player.target))])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.player.damage > 0
+      ? _c("h3", [
+          _vm._v("My damage calculation is " + _vm._s(_vm.player.damage))
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _c("button", { on: { click: _vm.generateOutput } }, [
+      _vm._v("Generate Output")
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-277166a2", module.exports)
+  }
+}
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    _vm._l(_vm.players, function(player) {
+      return _c("player", { key: player.name, attrs: { player: player } })
+    })
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-490e9ad6", module.exports)
+  }
+}
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(0)
+/* script */
+var __vue_script__ = __webpack_require__(20)
+/* template */
+var __vue_template__ = __webpack_require__(23)
+/* template functional */
+var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -15066,9 +15322,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-3ca050af", Component.options)
+    hotAPI.createRecord("data-v-895de848", Component.options)
   } else {
-    hotAPI.reload("data-v-3ca050af", Component.options)
+    hotAPI.reload("data-v-895de848", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -15079,13 +15335,13 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 16 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__store_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
 //
 //
@@ -15146,7 +15402,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 17 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -32235,10 +32491,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(18)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(22)(module)))
 
 /***/ }),
-/* 18 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -32266,7 +32522,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 19 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -32326,22 +32582,131 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-3ca050af", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-895de848", module.exports)
   }
 }
 
 /***/ }),
-/* 20 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(1)
+var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(21)
+var __vue_script__ = __webpack_require__(25)
 /* template */
-var __vue_template__ = __webpack_require__(34)
+var __vue_template__ = __webpack_require__(26)
 /* template functional */
-  var __vue_template_functional__ = false
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/js/components/lists/create.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-52f68b3c", Component.options)
+  } else {
+    hotAPI.reload("data-v-52f68b3c", Component.options)
+' + '  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {
+            loading: false
+        };
+    }
+});
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "panel panel-default" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "panel-body" }, [
+      _vm._v("\n        " + _vm._s(_vm.loading) + "\n    ")
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "panel-heading" }, [
+      _c("h3", { staticClass: "panel-title" }, [_vm._v("New List")])
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-52f68b3c", module.exports)
+  }
+}
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(0)
+/* script */
+var __vue_script__ = __webpack_require__(28)
+/* template */
+var __vue_template__ = __webpack_require__(41)
+/* template functional */
+var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -32366,9 +32731,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-52583c30", Component.options)
+    hotAPI.createRecord("data-v-df86313a", Component.options)
   } else {
-    hotAPI.reload("data-v-52583c30", Component.options)
+    hotAPI.reload("data-v-df86313a", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -32379,13 +32744,13 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 21 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__store_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_json_editor__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_json_editor__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_json_editor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue_json_editor__);
 //
 //
@@ -32429,21 +32794,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 22 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(23)
+  __webpack_require__(30)
 }
-var normalizeComponent = __webpack_require__(1)
+var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(27)
+var __vue_script__ = __webpack_require__(34)
 /* template */
-var __vue_template__ = __webpack_require__(33)
+var __vue_template__ = __webpack_require__(40)
 /* template functional */
-  var __vue_template_functional__ = false
+var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
@@ -32468,9 +32833,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-566ccedd", Component.options)
+    hotAPI.createRecord("data-v-551a97e0", Component.options)
   } else {
-    hotAPI.reload("data-v-566ccedd", Component.options)
+    hotAPI.reload("data-v-551a97e0", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -32481,23 +32846,23 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 23 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(24);
+var content = __webpack_require__(31);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(25)("3e874287", content, false);
+var update = __webpack_require__(32)("7a096e60", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
  if(!content.locals) {
-   module.hot.accept("!!../css-loader/index.js!../vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-566ccedd\",\"scoped\":false,\"hasInlineConfig\":true}!../vue-loader/lib/selector.js?type=styles&index=0&bustCache!./vue-json-editor.vue", function() {
-     var newContent = require("!!../css-loader/index.js!../vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-566ccedd\",\"scoped\":false,\"hasInlineConfig\":true}!../vue-loader/lib/selector.js?type=styles&index=0&bustCache!./vue-json-editor.vue");
+   module.hot.accept("!!../css-loader/index.js!../vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-551a97e0\",\"scoped\":false,\"hasInlineConfig\":true}!../vue-loader/lib/selector.js?type=styles&index=0&bustCache!./vue-json-editor.vue", function() {
+     var newContent = require("!!../css-loader/index.js!../vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-551a97e0\",\"scoped\":false,\"hasInlineConfig\":true}!../vue-loader/lib/selector.js?type=styles&index=0&bustCache!./vue-json-editor.vue");
      if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
      update(newContent);
    });
@@ -32507,7 +32872,7 @@ if(false) {
 }
 
 /***/ }),
-/* 24 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(4)(undefined);
@@ -32521,7 +32886,7 @@ exports.push([module.i, "\n.ace_line_group {\n  text-align: left;\n}\n.json-edit
 
 
 /***/ }),
-/* 25 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -32540,7 +32905,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(26)
+var listToStyles = __webpack_require__(33)
 
 /*
 type StyleObject = {
@@ -32742,7 +33107,7 @@ function applyToTag (styleElement, obj) {
 
 
 /***/ }),
-/* 26 */
+/* 33 */
 /***/ (function(module, exports) {
 
 /**
@@ -32775,14 +33140,14 @@ module.exports = function listToStyles (parentId, list) {
 
 
 /***/ }),
-/* 27 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__assets_jsoneditor_css__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__assets_jsoneditor_css__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__assets_jsoneditor_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__assets_jsoneditor_css__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__assets_jsoneditor__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__assets_jsoneditor__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__assets_jsoneditor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__assets_jsoneditor__);
 //
 //
@@ -32823,6 +33188,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           self.error = false;
         } catch (e) {
           self.error = true;
+          self.$emit('has-error');
         }
         if (!self.error) {
           self.json = json;
@@ -32846,13 +33212,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 28 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(29);
+var content = __webpack_require__(36);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -32860,7 +33226,7 @@ var transform;
 var options = {}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(30)(content, options);
+var update = __webpack_require__(37)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -32877,7 +33243,7 @@ if(false) {
 }
 
 /***/ }),
-/* 29 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(4)(undefined);
@@ -32885,13 +33251,13 @@ exports = module.exports = __webpack_require__(4)(undefined);
 
 
 // module
-exports.push([module.i, "/* reset styling (prevent conflicts with bootstrap, materialize.css, etc.) */\r\n\r\ndiv.jsoneditor .jsoneditor-search input {\r\n  height: auto;\r\n  border: inherit;\r\n}\r\n\r\ndiv.jsoneditor .jsoneditor-search input:focus {\r\n  border: none !important;\r\n  box-shadow: none !important;\r\n}\r\n\r\ndiv.jsoneditor table {\r\n  border-collapse: collapse;\r\n  width: auto;\r\n}\r\n\r\ndiv.jsoneditor td,\r\ndiv.jsoneditor th {\r\n  padding: 0;\r\n  display: table-cell;\r\n  text-align: left;\r\n  vertical-align: inherit;\r\n  border-radius: inherit;\r\n}\r\n\r\n\r\ndiv.jsoneditor-field,\r\ndiv.jsoneditor-value,\r\ndiv.jsoneditor-readonly {\r\n  border: 1px solid transparent;\r\n  min-height: 16px;\r\n  min-width: 32px;\r\n  padding: 2px;\r\n  margin: 1px;\r\n  word-wrap: break-word;\r\n  float: left;\r\n}\r\n\r\n/* adjust margin of p elements inside editable divs, needed for Opera, IE */\r\n\r\ndiv.jsoneditor-field p,\r\ndiv.jsoneditor-value p {\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor-value {\r\n  word-break: break-word;\r\n}\r\n\r\ndiv.jsoneditor-readonly {\r\n  min-width: 16px;\r\n  color: gray;\r\n}\r\n\r\ndiv.jsoneditor-empty {\r\n  border-color: lightgray;\r\n  border-style: dashed;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-empty::after,\r\ndiv.jsoneditor-value.jsoneditor-empty::after {\r\n  pointer-events: none;\r\n  color: lightgray;\r\n  font-size: 8pt;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-empty::after {\r\n  content: \"field\";\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-empty::after {\r\n  content: \"value\";\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-url,\r\na.jsoneditor-value.jsoneditor-url {\r\n  color: green;\r\n  text-decoration: underline;\r\n}\r\n\r\na.jsoneditor-value.jsoneditor-url {\r\n  display: inline-block;\r\n  padding: 2px;\r\n  margin: 2px;\r\n}\r\n\r\na.jsoneditor-value.jsoneditor-url:hover,\r\na.jsoneditor-value.jsoneditor-url:focus {\r\n  color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor td.jsoneditor-separator {\r\n  padding: 3px 0;\r\n  vertical-align: top;\r\n  color: gray;\r\n}\r\n\r\ndiv.jsoneditor-field[contenteditable=true]:focus,\r\ndiv.jsoneditor-field[contenteditable=true]:hover,\r\ndiv.jsoneditor-value[contenteditable=true]:focus,\r\ndiv.jsoneditor-value[contenteditable=true]:hover,\r\ndiv.jsoneditor-field.jsoneditor-highlight,\r\ndiv.jsoneditor-value.jsoneditor-highlight {\r\n  background-color: #FFFFAB;\r\n  border: 1px solid yellow;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-highlight-active,\r\ndiv.jsoneditor-field.jsoneditor-highlight-active:focus,\r\ndiv.jsoneditor-field.jsoneditor-highlight-active:hover,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active:focus,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active:hover {\r\n  background-color: #ffee00;\r\n  border: 1px solid #ffc700;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-string {\r\n  color: #008000;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-object,\r\ndiv.jsoneditor-value.jsoneditor-array {\r\n  min-width: 16px;\r\n  color: #808080;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-number {\r\n  color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-boolean {\r\n  color: #ff8c00;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-null {\r\n  color: #004ED0;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-invalid {\r\n  color: #000000;\r\n}\r\n\r\ndiv.jsoneditor-tree button {\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0;\r\n  border: none;\r\n  cursor: pointer;\r\n  background: transparent url(" + __webpack_require__(0) + ");\r\n}\r\n\r\ndiv.jsoneditor-mode-view tr.jsoneditor-expandable td.jsoneditor-tree,\r\ndiv.jsoneditor-mode-form tr.jsoneditor-expandable td.jsoneditor-tree {\r\n  cursor: pointer;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-collapsed {\r\n  background-position: 0 -48px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-expanded {\r\n  background-position: 0 -72px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu {\r\n  background-position: -48px -72px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu:hover,\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu:focus,\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu.jsoneditor-selected,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-contextmenu {\r\n  background-position: -48px -48px;\r\n}\r\n\r\ndiv.jsoneditor-tree *:focus {\r\n  outline: none;\r\n}\r\n\r\ndiv.jsoneditor-tree button:focus {\r\n  /* TODO: nice outline for buttons with focus\r\n  outline: #97B0F8 solid 2px;\r\n  box-shadow: 0 0 8px #97B0F8;\r\n  */\r\n  background-color: #f5f5f5;\r\n  outline: #e5e5e5 solid 1px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-invisible {\r\n  visibility: hidden;\r\n  background: none;\r\n}\r\n\r\ndiv.jsoneditor {\r\n  color: #1A1A1A;\r\n  border: 1px solid #3883fa;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  position: relative;\r\n  padding: 0;\r\n  line-height: 100%;\r\n}\r\n\r\ndiv.jsoneditor-tree table.jsoneditor-tree {\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  width: 100%;\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor-outer {\r\n  position: static;\r\n  width: 100%;\r\n  height: 100%;\r\n  margin: -35px 0 0 0;\r\n  padding: 35px 0 0 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n}\r\n\r\ntextarea.jsoneditor-text,\r\n.ace-jsoneditor {\r\n  min-height: 150px;\r\n}\r\n\r\ndiv.jsoneditor-tree {\r\n  width: 100%;\r\n  height: 100%;\r\n  position: relative;\r\n  overflow: auto;\r\n}\r\n\r\ntextarea.jsoneditor-text {\r\n  width: 100%;\r\n  height: 100%;\r\n  margin: 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  outline-width: 0;\r\n  border: none;\r\n  background-color: white;\r\n  resize: none;\r\n}\r\n\r\ntr.jsoneditor-highlight,\r\ntr.jsoneditor-selected {\r\n  background-color: #e6e6e6;\r\n}\r\n\r\ntr.jsoneditor-selected button.jsoneditor-dragarea,\r\ntr.jsoneditor-selected button.jsoneditor-contextmenu {\r\n  visibility: hidden;\r\n}\r\n\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-dragarea,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-contextmenu {\r\n  visibility: visible;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea {\r\n  background: url(" + __webpack_require__(0) + ") -72px -72px;\r\n  cursor: move;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea:hover,\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea:focus,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-dragarea {\r\n  background-position: -72px -48px;\r\n}\r\n\r\ndiv.jsoneditor tr,\r\ndiv.jsoneditor th,\r\ndiv.jsoneditor td {\r\n  padding: 0;\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor td {\r\n  vertical-align: top;\r\n}\r\n\r\ndiv.jsoneditor td.jsoneditor-tree {\r\n  vertical-align: top;\r\n}\r\n\r\ndiv.jsoneditor-field,\r\ndiv.jsoneditor-value,\r\ndiv.jsoneditor td,\r\ndiv.jsoneditor th,\r\ndiv.jsoneditor textarea,\r\n.jsoneditor-schema-error {\r\n  font-family: droid sans mono, consolas, monospace, courier new, courier, sans-serif;\r\n  font-size: 10pt;\r\n  color: #1A1A1A;\r\n}\r\n\r\n/* popover */\r\n\r\n.jsoneditor-schema-error {\r\n  cursor: default;\r\n  display: inline-block;\r\n  /*font-family: arial, sans-serif;*/\r\n  height: 24px;\r\n  line-height: 24px;\r\n  position: relative;\r\n  text-align: center;\r\n  width: 24px;\r\n}\r\n\r\ndiv.jsoneditor-tree .jsoneditor-schema-error {\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(0) + ")  -168px -48px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover {\r\n  background-color: #4c4c4c;\r\n  border-radius: 3px;\r\n  box-shadow: 0 0 5px rgba(0,0,0,0.4);\r\n  color: #fff;\r\n  display: none;\r\n  padding: 7px 10px;\r\n  position: absolute;\r\n  width: 200px;\r\n  z-index: 4;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-above {\r\n  bottom: 32px;\r\n  left: -98px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-below {\r\n  top: 32px;\r\n  left: -98px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-left {\r\n  top: -7px;\r\n  right: 32px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-right {\r\n  top: -7px;\r\n  left: 32px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover:before {\r\n  border-right: 7px solid transparent;\r\n  border-left: 7px solid transparent;\r\n  content: '';\r\n  display: block;\r\n  left: 50%;\r\n  margin-left: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-above:before {\r\n  border-top: 7px solid #4c4c4c;\r\n  bottom: -7px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-below:before {\r\n  border-bottom: 7px solid #4c4c4c;\r\n  top: -7px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-left:before {\r\n  border-left: 7px solid #4c4c4c;\r\n  border-top: 7px solid transparent;\r\n  border-bottom: 7px solid transparent;\r\n  content: '';\r\n  top: 19px;\r\n  right: -14px;\r\n  left: inherit;\r\n  margin-left: inherit;\r\n  margin-top: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-right:before {\r\n  border-right: 7px solid #4c4c4c;\r\n  border-top: 7px solid transparent;\r\n  border-bottom: 7px solid transparent;\r\n  content: '';\r\n  top: 19px;\r\n  left: -14px;\r\n  margin-left: inherit;\r\n  margin-top: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error:hover .jsoneditor-popover,\r\n.jsoneditor-schema-error:focus .jsoneditor-popover {\r\n  display: block;\r\n  -webkit-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n  -moz-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n  -ms-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n}\r\n\r\n@-webkit-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@-moz-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@-ms-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n/*@-webkit-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/*@-moz-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/*@-ms-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/* JSON schema errors displayed at the bottom of the editor in mode text and code */\r\n\r\n.jsoneditor .jsoneditor-text-errors {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  background-color: #ffef8b;\r\n  border-top: 1px solid #ffd700;\r\n}\r\n\r\n.jsoneditor .jsoneditor-text-errors td {\r\n  padding: 3px 6px;\r\n  vertical-align: middle;\r\n}\r\n\r\n.jsoneditor-text-errors .jsoneditor-schema-error {\r\n  border: none;\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(0) + ")  -168px -48px;\r\n}\r\n/* ContextMenu - main menu */\r\n\r\ndiv.jsoneditor-contextmenu-root {\r\n  position: relative;\r\n  width: 0;\r\n  height: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu {\r\n  position: absolute;\r\n  box-sizing: content-box;\r\n  z-index: 99999;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul,\r\ndiv.jsoneditor-contextmenu li {\r\n  box-sizing: content-box;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul {\r\n  position: relative;\r\n  left: 0;\r\n  top: 0;\r\n  width: 124px;\r\n  background: white;\r\n  border: 1px solid #d3d3d3;\r\n  box-shadow: 2px 2px 12px rgba(128, 128, 128, 0.3);\r\n  list-style: none;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button {\r\n  padding: 0;\r\n  margin: 0;\r\n  width: 124px;\r\n  height: 24px;\r\n  border: none;\r\n  cursor: pointer;\r\n  color: #4d4d4d;\r\n  background: transparent;\r\n  font-size: 10pt;\r\n  font-family: arial, sans-serif;\r\n  box-sizing: border-box;\r\n  line-height: 26px;\r\n  text-align: left;\r\n}\r\n\r\n/* Fix button padding in firefox */\r\n\r\ndiv.jsoneditor-contextmenu ul li button::-moz-focus-inner {\r\n  padding: 0;\r\n  border: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button:hover,\r\ndiv.jsoneditor-contextmenu ul li button:focus {\r\n  color: #1a1a1a;\r\n  background-color: #f5f5f5;\r\n  outline: none;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-default {\r\n  width: 92px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand {\r\n  float: right;\r\n  width: 32px;\r\n  height: 24px;\r\n  border-left: 1px solid #e5e5e5;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu div.jsoneditor-icon {\r\n  float: left;\r\n  width: 24px;\r\n  height: 24px;\r\n  border: none;\r\n  padding: 0;\r\n  margin: 0;\r\n  background-image: url(" + __webpack_require__(0) + ");\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button div.jsoneditor-expand {\r\n  float: right;\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(0) + ") 0 -72px;\r\n  opacity: 0.4;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button:hover div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button:focus div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li.jsoneditor-selected div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand:hover div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand:focus div.jsoneditor-expand {\r\n  opacity: 1;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu div.jsoneditor-separator {\r\n  height: 0;\r\n  border-top: 1px solid #e5e5e5;\r\n  padding-top: 5px;\r\n  margin-top: 5px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove > div.jsoneditor-icon {\r\n  background-position: -24px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove:focus > div.jsoneditor-icon {\r\n  background-position: -24px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append > div.jsoneditor-icon {\r\n  background-position: 0 -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append:focus > div.jsoneditor-icon {\r\n  background-position: 0 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert > div.jsoneditor-icon {\r\n  background-position: 0 -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert:focus > div.jsoneditor-icon {\r\n  background-position: 0 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate > div.jsoneditor-icon {\r\n  background-position: -48px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate:focus > div.jsoneditor-icon {\r\n  background-position: -48px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc > div.jsoneditor-icon {\r\n  background-position: -168px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc:focus > div.jsoneditor-icon {\r\n  background-position: -168px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc > div.jsoneditor-icon {\r\n  background-position: -192px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc:focus > div.jsoneditor-icon {\r\n  background-position: -192px 0;\r\n}\r\n\r\n/* ContextMenu - sub menu */\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected:hover,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected:focus {\r\n  color: white;\r\n  background-color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li {\r\n  overflow: hidden;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li ul {\r\n  display: none;\r\n  position: relative;\r\n  left: -10px;\r\n  top: 0;\r\n  border: none;\r\n  box-shadow: inset 0 0 10px rgba(128, 128, 128, 0.5);\r\n  padding: 0 10px;\r\n  /* TODO: transition is not supported on IE8-9 */\r\n  -webkit-transition: all 0.3s ease-out;\r\n  -moz-transition: all 0.3s ease-out;\r\n  -o-transition: all 0.3s ease-out;\r\n  transition: all 0.3s ease-out;\r\n}\r\n\r\n\r\n\r\ndiv.jsoneditor-contextmenu ul li ul li button {\r\n  padding-left: 24px;\r\n  animation: all ease-in-out 1s;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li ul li button:hover,\r\ndiv.jsoneditor-contextmenu ul li ul li button:focus {\r\n  background-color: #f5f5f5;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string > div.jsoneditor-icon {\r\n  background-position: -144px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -144px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto > div.jsoneditor-icon {\r\n  background-position: -120px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -120px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object > div.jsoneditor-icon {\r\n  background-position: -72px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -72px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array > div.jsoneditor-icon {\r\n  background-position: -96px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -96px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-modes > div.jsoneditor-icon {\r\n  background-image: none;\r\n  width: 6px;\r\n}\r\ndiv.jsoneditor-menu {\r\n  width: 100%;\r\n  height: 35px;\r\n  padding: 2px;\r\n  margin: 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  color: white;\r\n  background-color: #3883fa;\r\n  border-bottom: 1px solid #3883fa;\r\n}\r\n\r\ndiv.jsoneditor-menu > button,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button {\r\n  width: 26px;\r\n  height: 26px;\r\n  margin: 2px;\r\n  padding: 0;\r\n  border-radius: 2px;\r\n  border: 1px solid transparent;\r\n  background: transparent url(" + __webpack_require__(0) + ");\r\n  color: white;\r\n  opacity: 0.8;\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  float: left;\r\n}\r\n\r\ndiv.jsoneditor-menu > button:hover,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:hover {\r\n  background-color: rgba(255,255,255,0.2);\r\n  border: 1px solid rgba(255,255,255,0.4);\r\n}\r\n\r\ndiv.jsoneditor-menu > button:focus,\r\ndiv.jsoneditor-menu > button:active,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:focus,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:active {\r\n  background-color: rgba(255,255,255,0.3);\r\n}\r\n\r\ndiv.jsoneditor-menu > button:disabled,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:disabled {\r\n  opacity: 0.5;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-collapse-all {\r\n  background-position: 0 -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-expand-all {\r\n  background-position: 0 -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-undo {\r\n  background-position: -24px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-undo:disabled {\r\n  background-position: -24px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-redo {\r\n  background-position: -48px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-redo:disabled {\r\n  background-position: -48px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-compact {\r\n  background-position: -72px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-format {\r\n  background-position: -72px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > div.jsoneditor-modes {\r\n  display: inline-block;\r\n  float: left;\r\n}\r\n\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button {\r\n  background-image: none;\r\n  width: auto;\r\n  padding-left: 6px;\r\n  padding-right: 6px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-separator,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button.jsoneditor-separator {\r\n  margin-left: 10px;\r\n}\r\n\r\ndiv.jsoneditor-menu a {\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  color: white;\r\n  opacity: 0.8;\r\n  vertical-align: middle;\r\n}\r\n\r\ndiv.jsoneditor-menu a:hover {\r\n  opacity: 1;\r\n}\r\n\r\ndiv.jsoneditor-menu a.jsoneditor-poweredBy {\r\n  font-size: 8pt;\r\n  position: absolute;\r\n  right: 0;\r\n  top: 0;\r\n  padding: 10px;\r\n}\r\ntable.jsoneditor-search input,\r\ntable.jsoneditor-search div.jsoneditor-results {\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  color: #1A1A1A;\r\n  background: transparent;\r\n  /* For Firefox */\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-results {\r\n  color: white;\r\n  padding-right: 5px;\r\n  line-height: 24px;\r\n}\r\n\r\ntable.jsoneditor-search {\r\n  position: absolute;\r\n  right: 4px;\r\n  top: 4px;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-frame {\r\n  border: 1px solid transparent;\r\n  background-color: white;\r\n  padding: 0 2px;\r\n  margin: 0;\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-frame table {\r\n  border-collapse: collapse;\r\n}\r\n\r\ntable.jsoneditor-search input {\r\n  width: 120px;\r\n  border: none;\r\n  outline: none;\r\n  margin: 1px;\r\n  line-height: 20px;\r\n}\r\n\r\ntable.jsoneditor-search button {\r\n  width: 16px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0;\r\n  border: none;\r\n  background: url(" + __webpack_require__(0) + ");\r\n  vertical-align: top;\r\n}\r\n\r\ntable.jsoneditor-search button:hover {\r\n  background-color: transparent;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-refresh {\r\n  width: 18px;\r\n  background-position: -99px -73px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-next {\r\n  cursor: pointer;\r\n  background-position: -124px -73px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-next:hover {\r\n  background-position: -124px -49px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-previous {\r\n  cursor: pointer;\r\n  background-position: -148px -73px;\r\n  margin-right: 2px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-previous:hover {\r\n  background-position: -148px -49px;\r\n}", ""]);
+exports.push([module.i, "/* reset styling (prevent conflicts with bootstrap, materialize.css, etc.) */\r\n\r\ndiv.jsoneditor .jsoneditor-search input {\r\n  height: auto;\r\n  border: inherit;\r\n}\r\n\r\ndiv.jsoneditor .jsoneditor-search input:focus {\r\n  border: none !important;\r\n  box-shadow: none !important;\r\n}\r\n\r\ndiv.jsoneditor table {\r\n  border-collapse: collapse;\r\n  width: auto;\r\n}\r\n\r\ndiv.jsoneditor td,\r\ndiv.jsoneditor th {\r\n  padding: 0;\r\n  display: table-cell;\r\n  text-align: left;\r\n  vertical-align: inherit;\r\n  border-radius: inherit;\r\n}\r\n\r\n\r\ndiv.jsoneditor-field,\r\ndiv.jsoneditor-value,\r\ndiv.jsoneditor-readonly {\r\n  border: 1px solid transparent;\r\n  min-height: 16px;\r\n  min-width: 32px;\r\n  padding: 2px;\r\n  margin: 1px;\r\n  word-wrap: break-word;\r\n  float: left;\r\n}\r\n\r\n/* adjust margin of p elements inside editable divs, needed for Opera, IE */\r\n\r\ndiv.jsoneditor-field p,\r\ndiv.jsoneditor-value p {\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor-value {\r\n  word-break: break-word;\r\n}\r\n\r\ndiv.jsoneditor-readonly {\r\n  min-width: 16px;\r\n  color: gray;\r\n}\r\n\r\ndiv.jsoneditor-empty {\r\n  border-color: lightgray;\r\n  border-style: dashed;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-empty::after,\r\ndiv.jsoneditor-value.jsoneditor-empty::after {\r\n  pointer-events: none;\r\n  color: lightgray;\r\n  font-size: 8pt;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-empty::after {\r\n  content: \"field\";\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-empty::after {\r\n  content: \"value\";\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-url,\r\na.jsoneditor-value.jsoneditor-url {\r\n  color: green;\r\n  text-decoration: underline;\r\n}\r\n\r\na.jsoneditor-value.jsoneditor-url {\r\n  display: inline-block;\r\n  padding: 2px;\r\n  margin: 2px;\r\n}\r\n\r\na.jsoneditor-value.jsoneditor-url:hover,\r\na.jsoneditor-value.jsoneditor-url:focus {\r\n  color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor td.jsoneditor-separator {\r\n  padding: 3px 0;\r\n  vertical-align: top;\r\n  color: gray;\r\n}\r\n\r\ndiv.jsoneditor-field[contenteditable=true]:focus,\r\ndiv.jsoneditor-field[contenteditable=true]:hover,\r\ndiv.jsoneditor-value[contenteditable=true]:focus,\r\ndiv.jsoneditor-value[contenteditable=true]:hover,\r\ndiv.jsoneditor-field.jsoneditor-highlight,\r\ndiv.jsoneditor-value.jsoneditor-highlight {\r\n  background-color: #FFFFAB;\r\n  border: 1px solid yellow;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-field.jsoneditor-highlight-active,\r\ndiv.jsoneditor-field.jsoneditor-highlight-active:focus,\r\ndiv.jsoneditor-field.jsoneditor-highlight-active:hover,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active:focus,\r\ndiv.jsoneditor-value.jsoneditor-highlight-active:hover {\r\n  background-color: #ffee00;\r\n  border: 1px solid #ffc700;\r\n  border-radius: 2px;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-string {\r\n  color: #008000;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-object,\r\ndiv.jsoneditor-value.jsoneditor-array {\r\n  min-width: 16px;\r\n  color: #808080;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-number {\r\n  color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-boolean {\r\n  color: #ff8c00;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-null {\r\n  color: #004ED0;\r\n}\r\n\r\ndiv.jsoneditor-value.jsoneditor-invalid {\r\n  color: #000000;\r\n}\r\n\r\ndiv.jsoneditor-tree button {\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0;\r\n  border: none;\r\n  cursor: pointer;\r\n  background: transparent url(" + __webpack_require__(1) + ");\r\n}\r\n\r\ndiv.jsoneditor-mode-view tr.jsoneditor-expandable td.jsoneditor-tree,\r\ndiv.jsoneditor-mode-form tr.jsoneditor-expandable td.jsoneditor-tree {\r\n  cursor: pointer;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-collapsed {\r\n  background-position: 0 -48px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-expanded {\r\n  background-position: 0 -72px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu {\r\n  background-position: -48px -72px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu:hover,\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu:focus,\r\ndiv.jsoneditor-tree button.jsoneditor-contextmenu.jsoneditor-selected,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-contextmenu {\r\n  background-position: -48px -48px;\r\n}\r\n\r\ndiv.jsoneditor-tree *:focus {\r\n  outline: none;\r\n}\r\n\r\ndiv.jsoneditor-tree button:focus {\r\n  /* TODO: nice outline for buttons with focus\r\n  outline: #97B0F8 solid 2px;\r\n  box-shadow: 0 0 8px #97B0F8;\r\n  */\r\n  background-color: #f5f5f5;\r\n  outline: #e5e5e5 solid 1px;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-invisible {\r\n  visibility: hidden;\r\n  background: none;\r\n}\r\n\r\ndiv.jsoneditor {\r\n  color: #1A1A1A;\r\n  border: 1px solid #3883fa;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  position: relative;\r\n  padding: 0;\r\n  line-height: 100%;\r\n}\r\n\r\ndiv.jsoneditor-tree table.jsoneditor-tree {\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  width: 100%;\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor-outer {\r\n  position: static;\r\n  width: 100%;\r\n  height: 100%;\r\n  margin: -35px 0 0 0;\r\n  padding: 35px 0 0 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n}\r\n\r\ntextarea.jsoneditor-text,\r\n.ace-jsoneditor {\r\n  min-height: 150px;\r\n}\r\n\r\ndiv.jsoneditor-tree {\r\n  width: 100%;\r\n  height: 100%;\r\n  position: relative;\r\n  overflow: auto;\r\n}\r\n\r\ntextarea.jsoneditor-text {\r\n  width: 100%;\r\n  height: 100%;\r\n  margin: 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  outline-width: 0;\r\n  border: none;\r\n  background-color: white;\r\n  resize: none;\r\n}\r\n\r\ntr.jsoneditor-highlight,\r\ntr.jsoneditor-selected {\r\n  background-color: #e6e6e6;\r\n}\r\n\r\ntr.jsoneditor-selected button.jsoneditor-dragarea,\r\ntr.jsoneditor-selected button.jsoneditor-contextmenu {\r\n  visibility: hidden;\r\n}\r\n\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-dragarea,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-contextmenu {\r\n  visibility: visible;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea {\r\n  background: url(" + __webpack_require__(1) + ") -72px -72px;\r\n  cursor: move;\r\n}\r\n\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea:hover,\r\ndiv.jsoneditor-tree button.jsoneditor-dragarea:focus,\r\ntr.jsoneditor-selected.jsoneditor-first button.jsoneditor-dragarea {\r\n  background-position: -72px -48px;\r\n}\r\n\r\ndiv.jsoneditor tr,\r\ndiv.jsoneditor th,\r\ndiv.jsoneditor td {\r\n  padding: 0;\r\n  margin: 0;\r\n}\r\n\r\ndiv.jsoneditor td {\r\n  vertical-align: top;\r\n}\r\n\r\ndiv.jsoneditor td.jsoneditor-tree {\r\n  vertical-align: top;\r\n}\r\n\r\ndiv.jsoneditor-field,\r\ndiv.jsoneditor-value,\r\ndiv.jsoneditor td,\r\ndiv.jsoneditor th,\r\ndiv.jsoneditor textarea,\r\n.jsoneditor-schema-error {\r\n  font-family: droid sans mono, consolas, monospace, courier new, courier, sans-serif;\r\n  font-size: 10pt;\r\n  color: #1A1A1A;\r\n}\r\n\r\n/* popover */\r\n\r\n.jsoneditor-schema-error {\r\n  cursor: default;\r\n  display: inline-block;\r\n  /*font-family: arial, sans-serif;*/\r\n  height: 24px;\r\n  line-height: 24px;\r\n  position: relative;\r\n  text-align: center;\r\n  width: 24px;\r\n}\r\n\r\ndiv.jsoneditor-tree .jsoneditor-schema-error {\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(1) + ")  -168px -48px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover {\r\n  background-color: #4c4c4c;\r\n  border-radius: 3px;\r\n  box-shadow: 0 0 5px rgba(0,0,0,0.4);\r\n  color: #fff;\r\n  display: none;\r\n  padding: 7px 10px;\r\n  position: absolute;\r\n  width: 200px;\r\n  z-index: 4;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-above {\r\n  bottom: 32px;\r\n  left: -98px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-below {\r\n  top: 32px;\r\n  left: -98px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-left {\r\n  top: -7px;\r\n  right: 32px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-right {\r\n  top: -7px;\r\n  left: 32px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover:before {\r\n  border-right: 7px solid transparent;\r\n  border-left: 7px solid transparent;\r\n  content: '';\r\n  display: block;\r\n  left: 50%;\r\n  margin-left: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-above:before {\r\n  border-top: 7px solid #4c4c4c;\r\n  bottom: -7px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-below:before {\r\n  border-bottom: 7px solid #4c4c4c;\r\n  top: -7px;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-left:before {\r\n  border-left: 7px solid #4c4c4c;\r\n  border-top: 7px solid transparent;\r\n  border-bottom: 7px solid transparent;\r\n  content: '';\r\n  top: 19px;\r\n  right: -14px;\r\n  left: inherit;\r\n  margin-left: inherit;\r\n  margin-top: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error .jsoneditor-popover.jsoneditor-right:before {\r\n  border-right: 7px solid #4c4c4c;\r\n  border-top: 7px solid transparent;\r\n  border-bottom: 7px solid transparent;\r\n  content: '';\r\n  top: 19px;\r\n  left: -14px;\r\n  margin-left: inherit;\r\n  margin-top: -7px;\r\n  position: absolute;\r\n}\r\n\r\n.jsoneditor-schema-error:hover .jsoneditor-popover,\r\n.jsoneditor-schema-error:focus .jsoneditor-popover {\r\n  display: block;\r\n  -webkit-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n  -moz-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n  -ms-animation: fade-in .3s linear 1, move-up .3s linear 1;\r\n}\r\n\r\n@-webkit-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@-moz-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@-ms-keyframes fade-in {\r\n  from {\r\n    opacity: 0;\r\n  }\r\n\r\n  to {\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n/*@-webkit-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/*@-moz-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/*@-ms-keyframes move-up {*/\r\n\r\n/*from   { bottom: 24px; }*/\r\n\r\n/*to { bottom: 32px; }*/\r\n\r\n/*}*/\r\n\r\n/* JSON schema errors displayed at the bottom of the editor in mode text and code */\r\n\r\n.jsoneditor .jsoneditor-text-errors {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  background-color: #ffef8b;\r\n  border-top: 1px solid #ffd700;\r\n}\r\n\r\n.jsoneditor .jsoneditor-text-errors td {\r\n  padding: 3px 6px;\r\n  vertical-align: middle;\r\n}\r\n\r\n.jsoneditor-text-errors .jsoneditor-schema-error {\r\n  border: none;\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(1) + ")  -168px -48px;\r\n}\r\n/* ContextMenu - main menu */\r\n\r\ndiv.jsoneditor-contextmenu-root {\r\n  position: relative;\r\n  width: 0;\r\n  height: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu {\r\n  position: absolute;\r\n  box-sizing: content-box;\r\n  z-index: 99999;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul,\r\ndiv.jsoneditor-contextmenu li {\r\n  box-sizing: content-box;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul {\r\n  position: relative;\r\n  left: 0;\r\n  top: 0;\r\n  width: 124px;\r\n  background: white;\r\n  border: 1px solid #d3d3d3;\r\n  box-shadow: 2px 2px 12px rgba(128, 128, 128, 0.3);\r\n  list-style: none;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button {\r\n  padding: 0;\r\n  margin: 0;\r\n  width: 124px;\r\n  height: 24px;\r\n  border: none;\r\n  cursor: pointer;\r\n  color: #4d4d4d;\r\n  background: transparent;\r\n  font-size: 10pt;\r\n  font-family: arial, sans-serif;\r\n  box-sizing: border-box;\r\n  line-height: 26px;\r\n  text-align: left;\r\n}\r\n\r\n/* Fix button padding in firefox */\r\n\r\ndiv.jsoneditor-contextmenu ul li button::-moz-focus-inner {\r\n  padding: 0;\r\n  border: 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button:hover,\r\ndiv.jsoneditor-contextmenu ul li button:focus {\r\n  color: #1a1a1a;\r\n  background-color: #f5f5f5;\r\n  outline: none;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-default {\r\n  width: 92px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand {\r\n  float: right;\r\n  width: 32px;\r\n  height: 24px;\r\n  border-left: 1px solid #e5e5e5;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu div.jsoneditor-icon {\r\n  float: left;\r\n  width: 24px;\r\n  height: 24px;\r\n  border: none;\r\n  padding: 0;\r\n  margin: 0;\r\n  background-image: url(" + __webpack_require__(1) + ");\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button div.jsoneditor-expand {\r\n  float: right;\r\n  width: 24px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0 4px 0 0;\r\n  background: url(" + __webpack_require__(1) + ") 0 -72px;\r\n  opacity: 0.4;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li button:hover div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button:focus div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li.jsoneditor-selected div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand:hover div.jsoneditor-expand,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-expand:focus div.jsoneditor-expand {\r\n  opacity: 1;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu div.jsoneditor-separator {\r\n  height: 0;\r\n  border-top: 1px solid #e5e5e5;\r\n  padding-top: 5px;\r\n  margin-top: 5px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove > div.jsoneditor-icon {\r\n  background-position: -24px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-remove:focus > div.jsoneditor-icon {\r\n  background-position: -24px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append > div.jsoneditor-icon {\r\n  background-position: 0 -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-append:focus > div.jsoneditor-icon {\r\n  background-position: 0 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert > div.jsoneditor-icon {\r\n  background-position: 0 -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-insert:focus > div.jsoneditor-icon {\r\n  background-position: 0 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate > div.jsoneditor-icon {\r\n  background-position: -48px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-duplicate:focus > div.jsoneditor-icon {\r\n  background-position: -48px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc > div.jsoneditor-icon {\r\n  background-position: -168px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-asc:focus > div.jsoneditor-icon {\r\n  background-position: -168px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc > div.jsoneditor-icon {\r\n  background-position: -192px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-sort-desc:focus > div.jsoneditor-icon {\r\n  background-position: -192px 0;\r\n}\r\n\r\n/* ContextMenu - sub menu */\r\n\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected:hover,\r\ndiv.jsoneditor-contextmenu ul li button.jsoneditor-selected:focus {\r\n  color: white;\r\n  background-color: #ee422e;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li {\r\n  overflow: hidden;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li ul {\r\n  display: none;\r\n  position: relative;\r\n  left: -10px;\r\n  top: 0;\r\n  border: none;\r\n  box-shadow: inset 0 0 10px rgba(128, 128, 128, 0.5);\r\n  padding: 0 10px;\r\n  /* TODO: transition is not supported on IE8-9 */\r\n  -webkit-transition: all 0.3s ease-out;\r\n  -moz-transition: all 0.3s ease-out;\r\n  -o-transition: all 0.3s ease-out;\r\n  transition: all 0.3s ease-out;\r\n}\r\n\r\n\r\n\r\ndiv.jsoneditor-contextmenu ul li ul li button {\r\n  padding-left: 24px;\r\n  animation: all ease-in-out 1s;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu ul li ul li button:hover,\r\ndiv.jsoneditor-contextmenu ul li ul li button:focus {\r\n  background-color: #f5f5f5;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string > div.jsoneditor-icon {\r\n  background-position: -144px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-string.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -144px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto > div.jsoneditor-icon {\r\n  background-position: -120px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-auto.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -120px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object > div.jsoneditor-icon {\r\n  background-position: -72px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-object.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -72px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array > div.jsoneditor-icon {\r\n  background-position: -96px -24px;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array:hover > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array:focus > div.jsoneditor-icon,\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-array.jsoneditor-selected > div.jsoneditor-icon {\r\n  background-position: -96px 0;\r\n}\r\n\r\ndiv.jsoneditor-contextmenu button.jsoneditor-type-modes > div.jsoneditor-icon {\r\n  background-image: none;\r\n  width: 6px;\r\n}\r\ndiv.jsoneditor-menu {\r\n  width: 100%;\r\n  height: 35px;\r\n  padding: 2px;\r\n  margin: 0;\r\n  -moz-box-sizing: border-box;\r\n  -webkit-box-sizing: border-box;\r\n  box-sizing: border-box;\r\n  color: white;\r\n  background-color: #3883fa;\r\n  border-bottom: 1px solid #3883fa;\r\n}\r\n\r\ndiv.jsoneditor-menu > button,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button {\r\n  width: 26px;\r\n  height: 26px;\r\n  margin: 2px;\r\n  padding: 0;\r\n  border-radius: 2px;\r\n  border: 1px solid transparent;\r\n  background: transparent url(" + __webpack_require__(1) + ");\r\n  color: white;\r\n  opacity: 0.8;\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  float: left;\r\n}\r\n\r\ndiv.jsoneditor-menu > button:hover,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:hover {\r\n  background-color: rgba(255,255,255,0.2);\r\n  border: 1px solid rgba(255,255,255,0.4);\r\n}\r\n\r\ndiv.jsoneditor-menu > button:focus,\r\ndiv.jsoneditor-menu > button:active,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:focus,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:active {\r\n  background-color: rgba(255,255,255,0.3);\r\n}\r\n\r\ndiv.jsoneditor-menu > button:disabled,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button:disabled {\r\n  opacity: 0.5;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-collapse-all {\r\n  background-position: 0 -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-expand-all {\r\n  background-position: 0 -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-undo {\r\n  background-position: -24px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-undo:disabled {\r\n  background-position: -24px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-redo {\r\n  background-position: -48px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-redo:disabled {\r\n  background-position: -48px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-compact {\r\n  background-position: -72px -96px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-format {\r\n  background-position: -72px -120px;\r\n}\r\n\r\ndiv.jsoneditor-menu > div.jsoneditor-modes {\r\n  display: inline-block;\r\n  float: left;\r\n}\r\n\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button {\r\n  background-image: none;\r\n  width: auto;\r\n  padding-left: 6px;\r\n  padding-right: 6px;\r\n}\r\n\r\ndiv.jsoneditor-menu > button.jsoneditor-separator,\r\ndiv.jsoneditor-menu > div.jsoneditor-modes > button.jsoneditor-separator {\r\n  margin-left: 10px;\r\n}\r\n\r\ndiv.jsoneditor-menu a {\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  color: white;\r\n  opacity: 0.8;\r\n  vertical-align: middle;\r\n}\r\n\r\ndiv.jsoneditor-menu a:hover {\r\n  opacity: 1;\r\n}\r\n\r\ndiv.jsoneditor-menu a.jsoneditor-poweredBy {\r\n  font-size: 8pt;\r\n  position: absolute;\r\n  right: 0;\r\n  top: 0;\r\n  padding: 10px;\r\n}\r\ntable.jsoneditor-search input,\r\ntable.jsoneditor-search div.jsoneditor-results {\r\n  font-family: arial, sans-serif;\r\n  font-size: 10pt;\r\n  color: #1A1A1A;\r\n  background: transparent;\r\n  /* For Firefox */\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-results {\r\n  color: white;\r\n  padding-right: 5px;\r\n  line-height: 24px;\r\n}\r\n\r\ntable.jsoneditor-search {\r\n  position: absolute;\r\n  right: 4px;\r\n  top: 4px;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-frame {\r\n  border: 1px solid transparent;\r\n  background-color: white;\r\n  padding: 0 2px;\r\n  margin: 0;\r\n}\r\n\r\ntable.jsoneditor-search div.jsoneditor-frame table {\r\n  border-collapse: collapse;\r\n}\r\n\r\ntable.jsoneditor-search input {\r\n  width: 120px;\r\n  border: none;\r\n  outline: none;\r\n  margin: 1px;\r\n  line-height: 20px;\r\n}\r\n\r\ntable.jsoneditor-search button {\r\n  width: 16px;\r\n  height: 24px;\r\n  padding: 0;\r\n  margin: 0;\r\n  border: none;\r\n  background: url(" + __webpack_require__(1) + ");\r\n  vertical-align: top;\r\n}\r\n\r\ntable.jsoneditor-search button:hover {\r\n  background-color: transparent;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-refresh {\r\n  width: 18px;\r\n  background-position: -99px -73px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-next {\r\n  cursor: pointer;\r\n  background-position: -124px -73px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-next:hover {\r\n  background-position: -124px -49px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-previous {\r\n  cursor: pointer;\r\n  background-position: -148px -73px;\r\n  margin-right: 2px;\r\n}\r\n\r\ntable.jsoneditor-search button.jsoneditor-previous:hover {\r\n  background-position: -148px -49px;\r\n}", ""]);
 
 // exports
 
 
 /***/ }),
-/* 30 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -32937,7 +33303,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(31);
+var	fixUrls = __webpack_require__(38);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -33250,7 +33616,7 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
-/* 31 */
+/* 38 */
 /***/ (function(module, exports) {
 
 
@@ -33345,7 +33711,7 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 32 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -69727,7 +70093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 ;
 
 /***/ }),
-/* 33 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -69762,12 +70128,12 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-566ccedd", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-551a97e0", module.exports)
   }
 }
 
 /***/ }),
-/* 34 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -69800,22 +70166,22 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-52583c30", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-df86313a", module.exports)
   }
 }
 
 /***/ }),
-/* 35 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(1)
+var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(36)
+var __vue_script__ = __webpack_require__(43)
 /* template */
-var __vue_template__ = __webpack_require__(40)
+var __vue_template__ = __webpack_require__(47)
 /* template functional */
-  var __vue_template_functional__ = false
+var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -69840,9 +70206,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-31ef5f29", Component.options)
+    hotAPI.createRecord("data-v-1d3908d4", Component.options)
   } else {
-    hotAPI.reload("data-v-31ef5f29", Component.options)
+    hotAPI.reload("data-v-1d3908d4", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -69853,12 +70219,12 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 36 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_navbar__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_navbar__ = __webpack_require__(44);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_navbar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_navbar__);
 //
 //
@@ -69880,17 +70246,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 37 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
-var normalizeComponent = __webpack_require__(1)
+var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(38)
+var __vue_script__ = __webpack_require__(45)
 /* template */
-var __vue_template__ = __webpack_require__(39)
+var __vue_template__ = __webpack_require__(46)
 /* template functional */
-  var __vue_template_functional__ = false
+var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -69915,9 +70281,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-37b29f09", Component.options)
+    hotAPI.createRecord("data-v-bb8a4888", Component.options)
   } else {
-    hotAPI.reload("data-v-37b29f09", Component.options)
+    hotAPI.reload("data-v-bb8a4888", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -69928,7 +70294,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 38 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -69950,7 +70316,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony default export */ __webpack_exports__["default"] = ({});
 
 /***/ }),
-/* 39 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -69987,12 +70353,12 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-37b29f09", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-bb8a4888", module.exports)
   }
 }
 
 /***/ }),
-/* 40 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -70015,130 +70381,15 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-31ef5f29", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-1d3908d4", module.exports)
   }
 }
 
 /***/ }),
-/* 41 */
+/* 48 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 42 */,
-/* 43 */,
-/* 44 */,
-/* 45 */,
-/* 46 */,
-/* 47 */,
-/* 48 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var normalizeComponent = __webpack_require__(1)
-/* script */
-var __vue_script__ = __webpack_require__(50)
-/* template */
-var __vue_template__ = __webpack_require__(49)
-/* template functional */
-  var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = null
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/js/components/lists/create.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-7f1e0fef", Component.options)
-  } else {
-    hotAPI.reload("data-v-7f1e0fef", Component.options)
-' + '  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "panel panel-default" }, [
-    _vm._m(0),
-    _vm._v(" "),
-    _c("div", { staticClass: "panel-body" }, [
-      _vm._v("\n        " + _vm._s(_vm.loading) + "\n    ")
-    ])
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "panel-heading" }, [
-      _c("h3", { staticClass: "panel-title" }, [_vm._v("New List")])
-    ])
-  }
-]
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-7f1e0fef", module.exports)
-  }
-}
-
-/***/ }),
-/* 50 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            loading: false
-        };
-    }
-});
 
 /***/ })
 /******/ ]);
