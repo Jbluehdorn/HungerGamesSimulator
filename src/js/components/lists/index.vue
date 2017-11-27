@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import store from "../../store.js";
+import store from "../../store/file-store.js";
 import _ from 'lodash'
 
 export default {

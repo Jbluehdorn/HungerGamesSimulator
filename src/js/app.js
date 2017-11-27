@@ -25,7 +25,10 @@ const router = new VueRouter({
     }]
 });
 
+const store = require('./store/vue-store').default;
+
 const vm = new Vue({
     render: h => h(require('./Main')),
-    router
+    router,
+    store
 }).$mount('#main');

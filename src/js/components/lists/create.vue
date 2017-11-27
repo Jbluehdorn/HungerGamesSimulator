@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import store from '../../store.js'
+import store from '../../store/file-store.js'
 import vueJsonEditor from 'vue-json-editor'
 
 export default {

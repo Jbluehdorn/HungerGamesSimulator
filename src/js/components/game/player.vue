@@ -10,7 +10,7 @@
     <button @click="getTarget">Get Target</button>
     <button @click="getDamage">Get Damage</button>
     /Test Buttons -->
-    <button @click="generateOutput">Generate Output</button>
+    <button class="btn btn-primary" @click="generateOutput">Generate Output</button>
   </div>
 </template>
 

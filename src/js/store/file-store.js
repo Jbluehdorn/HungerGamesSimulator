@@ -7,6 +7,9 @@ export default {
         return fs.readdirSync(listsFolder);
     },
     loadFile(fileName) {
+        if(fileName === null)
+            return JSON.stringify([]);
+
         return fs.readFileSync(listsFolder + fileName, 'utf8');
     },
     writeFile(fileName, json, callback) {
