@@ -1,0 +1,19 @@
+
+
+Rough Logic
+  Index:
+    - coachList
+    - gameLoop
+    - helperFunctions
+    + controller.js import
+    
+  gameLoop:   //edit coach information in place allowing v-model to do work, probably return coach object on controller calls.
+    while(cond):
+      shuffle(coaches)
+      for coach in coaches:
+        controller.getAction(coach)
+        controller.getTarget(coach, coaches) //ensure target != coach, and if action isn't attack, override in controller
+        controller.calculateOutcome(coach, target) //for text feed, damage calculation, etc
+        generateOutput() //text feed
+        updateBoard() //may be handled by v-model
+        checkStuff() //mostly, are we down to just 1 coach thus ending the loop
