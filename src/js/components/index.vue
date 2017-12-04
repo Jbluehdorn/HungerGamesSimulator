@@ -8,23 +8,17 @@
             </select>
         </div>
 
-        <!-- This is demonstrative. Delete it once more is added. -->
-        <table class="table-responsive table">
-            <tbody>
-                <tr v-for="character in characters" :key="character.id">
-                    <td>{{character.name}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <game-board v-model="characters"></game-board>
     </div>
 </template>
 
 <script>
   import player from './game/player'
+  import gameBoard from './game/index'
   import {mapGetters, mapActions} from 'vuex'
 
   export default {
-    components: {player},
+    components: {player, gameBoard},
     data() {
         return {
             fileName: null
