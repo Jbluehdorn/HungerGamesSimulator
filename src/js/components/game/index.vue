@@ -11,10 +11,15 @@
 </template>
 
 <script>
+import controller from './controller'
+
 export default {
     model: {
         prop: 'characters'
     },
-    props: ['characters']
+    props: ['characters'],
+    mounted() {
+        controller.test();
+    }
 }
 </script>
